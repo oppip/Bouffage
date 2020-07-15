@@ -1,0 +1,83 @@
+﻿@model IEnumerable<Bouffage.Models.Comment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Critique)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CommentPosted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Useful)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Useless)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeOfComments)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserCommentedId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CommentOnRecipeId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reply)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Critique)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentPosted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Useful)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Useless)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeOfComments)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserCommentedId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentOnRecipeId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reply.Critique)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CommentId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CommentId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CommentId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

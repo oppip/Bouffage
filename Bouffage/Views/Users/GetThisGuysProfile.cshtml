@@ -1,0 +1,140 @@
+﻿@model Bouffage.ViewModels.UserRecipesViewModel
+@{
+    ViewData["Title"] = "GetThisGuysProfile";
+}
+
+    <div class="card bg-warning" style="width: 100%; margin-left: 7px;">
+        <div class="card-body">
+            <div class="inline">
+                <h4 class="card-title">@Html.DisplayFor(modelItem => Model.User.Username)</h4>
+                <h6 class="card-subtitle mb-2 text-muted">@Html.DisplayFor(modelItem => Model.User.Email)</h6>
+            </div>
+            <div class="inline">
+                <div>
+                    <p class="card-text inline"> Following: @Html.DisplayFor(modelItem => Model.User.Following)</p>
+                    <p class="card-text inline"> Followers: @Html.DisplayFor(modelItem => Model.User.Followers)</p>
+                </div>
+                <h4 style="margin: auto; display: inline-block">
+                    <a class="follow" asp-controller="User" asp-action="Follow" asp-route-id="@Model.User.UserId">
+                       Follow
+                    </a>
+                </h4>
+            </div>
+            <div class="inline" style="width: 30%">
+                <p style="text-align:center">
+                    Karma: @Html.DisplayFor(modelItem => Model.User.Karma)
+                </p>
+                <div class="progress justify-content-end" id="progress-bar">
+                    @{ var percentage = 0.0;
+                        foreach (var item in Model.Recipes)
+                        {
+                            percentage += item.Upvotes;
+                            percentage += item.Downvotes;
+                        }
+                        foreach (var item in Model.Comments)
+                        {
+                            percentage += item.Useful;
+                            percentage += item.Useless;
+                        }
+                        var karma = Model.User.Karma;
+
+                        percentage = (double) karma / percentage;
+                        percentage *= 100;
+                        percentage = Math.Round(percentage);
+
+                        if (percentage >200)
+                        {
+                            Random r = new Random();
+                            int per = r.Next(100);          //for those who dont have posts just for test
+                            percentage = (double) per;
+                        }
+                        percentage = 100 - percentage;
+                    }
+                    <div class="progress-bar bg-white" role="progressbar" style="width: @percentage%;" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+
+            <a href="#" class="card-link">Card link</a>
+        </div>
+    </div>
+    <br />
+<div>
+    <div class="inline" style="width: 59%; float: left;">
+        @foreach (var item in Model.Recipes)
+        {
+            <div class="card border-secondary mb-3" style="margin: auto;">
+                <span id="@item.RecipeId"></span>
+
+                <div class="card-header">
+                    <h4 style="margin: 0px; display: inline-block">
+                        <a class="username" asp-controller="Recipes" asp-action="ShowThisRecipe" asp-route-id="@item.RecipeId">
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </a>
+                    </h4>
+                    <span class="card-text">  STUFF FOR VOTING</span>
+                </div>
+
+                <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+
+                <div class="card-body">
+                    <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
+                    <br />
+
+                    <p>
+                        @Html.DisplayFor(modelItem => item.Preparation)
+                    </p>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    @foreach (var ingredient in Model.Ingredients)
+                    {
+                        @if (ingredient.RecipeId == item.RecipeId)
+                        {
+                            <li class="list-group-item">
+                                @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
+                            </li>
+                        }
+                    }
+                </ul>
+                <br />
+
+                <div class="card-footer text-muted">
+                    @Html.DisplayFor(modelItem => item.PostingDate)
+                </div>
+
+            </div>
+        }
+    </div>
+
+    <div class="inline" style="width: 35%; float: right;">
+        @foreach (var comment in Model.Comments)
+        {
+            <div class="card text-white bg-info mb-3" style="width: auto;">
+                <div class="card-header">
+                    <a class="username" asp-controller="Recipes" asp-action="ShowThisRecipe" asp-route-id="@comment.Recipe.RecipeId">
+                        @Html.DisplayFor(modelItem => comment.Recipe.Title)
+                    </a>
+                </div>
+                <div class="card-body">
+                    <h6 class="inline">
+                        @Html.DisplayFor(modelItem => Model.User.Username)
+                    </h6>
+                    <span>   stuff for voting</span>
+                    <br />
+
+                    <h5 class="card-text">
+                        @Html.DisplayFor(modelItem => comment.Critique)
+                    </h5>
+                </div>
+                <div class="card-footer">
+                    @Html.DisplayFor(modelItem => comment.CommentPosted)
+                </div>
+            </div>
+            <br />
+        }
+    </div>
+ </div>
+<div style="clear: both"></div>
+
+<!--select recipe da se pokaze od kaj korisnikot tocno toj recep
+    -->

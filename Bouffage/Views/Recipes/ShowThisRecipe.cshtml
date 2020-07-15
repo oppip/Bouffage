@@ -1,0 +1,14 @@
+﻿@model Bouffage.ViewModels.SingleRecipeViewModel
+
+@{
+    ViewData["Title"] = Model.Recipe.Title;
+}
+
+<h1>@Html.DisplayFor(modelItem => Model.Recipe.Title)</h1>
+
+@foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
+{
+    <h4>@Html.DisplayFor(modelItem => comment.Critique)</h4> 
+    <br />
+    <br />
+}

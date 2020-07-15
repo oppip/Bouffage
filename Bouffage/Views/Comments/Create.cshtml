@@ -1,0 +1,72 @@
+﻿@model Bouffage.Models.Comment
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Comment</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Critique" class="control-label"></label>
+                <input asp-for="Critique" class="form-control" />
+                <span asp-validation-for="Critique" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CommentPosted" class="control-label"></label>
+                <input asp-for="CommentPosted" class="form-control" />
+                <span asp-validation-for="CommentPosted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Useful" class="control-label"></label>
+                <input asp-for="Useful" class="form-control" />
+                <span asp-validation-for="Useful" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Useless" class="control-label"></label>
+                <input asp-for="Useless" class="form-control" />
+                <span asp-validation-for="Useless" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TypeId" class="control-label"></label>
+                <input asp-for="TypeId" class="form-control" />
+                <span asp-validation-for="TypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TypeOfComments" class="control-label"></label>
+                <select asp-for="TypeOfComments" class="form-control"></select>
+                <span asp-validation-for="TypeOfComments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserCommentedId" class="control-label"></label>
+                <input asp-for="UserCommentedId" class="form-control" />
+                <span asp-validation-for="UserCommentedId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CommentOnRecipeId" class="control-label"></label>
+                <input asp-for="CommentOnRecipeId" class="form-control" />
+                <span asp-validation-for="CommentOnRecipeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReplyCommentId" class="control-label"></label>
+                <select asp-for="ReplyCommentId" class ="form-control" asp-items="ViewBag.ReplyCommentId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

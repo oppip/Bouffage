@@ -1,0 +1,94 @@
+﻿@model Bouffage.ViewModels.RecipeAndCommentsViewModel
+
+@{
+    ViewData["Title"] = "All Recipes";
+}
+
+<!DOCTYPE html>
+<link rel="stylesheet" type="text/css" href="~/css/Recipe.css" />
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+
+@foreach (var item in Model.Recipes)
+{
+<div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
+    <span id="@item.RecipeId"></span>
+
+    <div class="card-header">
+        <h4 style="margin: 0px;">
+            <p style="margin: 0px;">
+                @Html.DisplayFor(modelItem => item.Title)
+            </p>
+        </h4>
+    </div>
+
+    <div class="card-body">
+            <a class="username" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
+                @Html.DisplayFor(modelItem => item.User.Username)
+            </a>
+        <p class="card-text">STUFF FOR VOTING</p>
+    </div>
+
+    <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+
+    <div class="card-body">
+        <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
+        <br/>
+
+        <p>
+            @Html.DisplayFor(modelItem => item.Preparation)
+        </p>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        @foreach (var ingredient in Model.Ingredients)
+        {
+            @if (ingredient.RecipeId == item.RecipeId)
+            {
+                <li class="list-group-item">
+                    @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
+                </li>
+            }
+        }
+    </ul>
+    <br />
+
+
+    @foreach (var comment in Model.Comments)
+    {
+            @if (comment.CommentOnRecipeId == item.RecipeId)
+            {
+                <div class="card text-white bg-info mb-3" style="width: auto;">
+                    <div class="card-header">
+                        @foreach (var user in Model.Users)
+                            @if (comment.UserCommentedId == user.UserId)
+                            {
+                              @Html.DisplayFor(modelItem => user.Username) 
+
+                             <span>stuff for voting</span>
+                        
+                            }
+                    </div>
+                    <div class="card-body">
+                       <h5 class="card-text">
+                           @Html.DisplayFor(modelItem => comment.Critique)
+                       </h5>
+                    </div>
+                    <div class="card-footer">
+                        @Html.DisplayFor(modelItem => comment.CommentPosted)
+                    </div>
+                </div>
+            }
+    }
+
+    <div class="card-footer text-muted">
+    @Html.DisplayFor(modelItem => item.PostingDate)
+    </div>
+
+</div>
+
+}

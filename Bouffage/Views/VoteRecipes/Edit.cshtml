@@ -1,0 +1,44 @@
+﻿@model Bouffage.Models.VoteRecipe
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>VoteRecipe</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="VoteRecipeId" />
+            <div class="form-group">
+                <label asp-for="UserVotedThisRecipe" class="control-label"></label>
+                <select asp-for="UserVotedThisRecipe" class="form-control" asp-items="ViewBag.UserVotedThisRecipe"></select>
+                <span asp-validation-for="UserVotedThisRecipe" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecipeGotVoted" class="control-label"></label>
+                <input asp-for="RecipeGotVoted" class="form-control" />
+                <span asp-validation-for="RecipeGotVoted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UpOrDown" class="control-label"></label>
+                <input asp-for="UpOrDown" class="form-control" />
+                <span asp-validation-for="UpOrDown" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

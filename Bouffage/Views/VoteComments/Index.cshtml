@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Bouffage.Models.VoteComment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CommentGotVoted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpOrDown)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CommentGotVoted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comment.Critique)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpOrDown)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.VoteCommentId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.VoteCommentId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.VoteCommentId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
