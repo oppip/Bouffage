@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bouffage
 {
@@ -28,7 +29,11 @@ namespace Bouffage
             services.AddControllersWithViews();
 
             services.AddDbContext<BouffageContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("BouffageContext")));
+                   options.UseSqlServer(Configuration.GetConnectionString("BouffageContext")));
+
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<BouffageContext>();
 
         }
 
@@ -50,6 +55,7 @@ namespace Bouffage
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

@@ -1,6 +1,6 @@
 ﻿@model Bouffage.ViewModels.UserRecipesViewModel
 @{
-    ViewData["Title"] = "GetThisGuysProfile";
+    ViewData["Title"] = Html.DisplayFor(modelItem => Model.User.Username);
 }
 
     <div class="card bg-warning" style="width: 100%; margin-left: 7px;">

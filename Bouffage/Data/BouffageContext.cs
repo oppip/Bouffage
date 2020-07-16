@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Bouffage.Data
 {
-    public class BouffageContext : DbContext
+    public class BouffageContext : IdentityDbContext
     {
         public BouffageContext (DbContextOptions<BouffageContext> options)
             : base(options)
@@ -23,6 +24,8 @@ namespace Bouffage.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             {
                 /* base.OnModelCreating(builder);
 
