@@ -186,7 +186,7 @@ namespace Bouffage.Controllers
 
             var recipe = await _context.Recipe.FirstOrDefaultAsync(m => m.RecipeId == id);
             IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
-            recipes = recipes.Where(m => m.RecipeId == id).Include(m => m.User).Include(m => m.CommentsOnThisRecipe).Include(m => m.Ingredients);
+            recipes = recipes.Where(m => m.RecipeId == id).Include(m => m.User).Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(s => s.User);
             if (recipe == null)
             {
                 return NotFound();
@@ -199,5 +199,6 @@ namespace Bouffage.Controllers
 
             return View(recipesandcomments);
         }
+
     }
 }

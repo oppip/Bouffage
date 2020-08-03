@@ -27,10 +27,10 @@
     </div>
 
     <div class="card-body">
-            <a class="username" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
+            <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
                 @Html.DisplayFor(modelItem => item.User.Username)
             </a>
-        <p class="card-text">STUFF FOR VOTING</p>
+        <span class="card-text">STUFF FOR VOTING</span>
     </div>
 
     <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">

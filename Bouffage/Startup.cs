@@ -1,4 +1,4 @@
-﻿using System;
+﻿  using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Bouffage
 {
@@ -26,14 +27,18 @@ namespace Bouffage
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                    {
+                        options.LoginPath = "/Home/OpenLogin";
+                        options.Cookie.Name = "YoutubeCookie";
+                    }
+                ) ;
+            services.AddMvc();
+            services.AddHttpContextAccessor();
 
             services.AddDbContext<BouffageContext>(options =>
                    options.UseSqlServer(Configuration.GetConnectionString("BouffageContext")));
-
-
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<BouffageContext>();
 
         }
 
@@ -57,6 +62,8 @@ namespace Bouffage
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCookiePolicy(); 
 
             app.UseEndpoints(endpoints =>
             {

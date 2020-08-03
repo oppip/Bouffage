@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bouffage.Controllers
 {
@@ -20,7 +21,7 @@ namespace Bouffage.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Recipes");
         }
 
         public IActionResult Privacy()
@@ -32,6 +33,14 @@ namespace Bouffage.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult OpenLogin()
+        {
+            /*var str = "document.getElementById('id01').style.display='block'";
+            return Content(str);*/
+            ViewData["show"] = true;
+            return View("Index");
         }
     }
 }

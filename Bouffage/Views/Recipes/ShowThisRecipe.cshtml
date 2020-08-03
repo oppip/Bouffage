@@ -4,11 +4,70 @@
     ViewData["Title"] = Model.Recipe.Title;
 }
 
-<h1>@Html.DisplayFor(modelItem => Model.Recipe.Title)</h1>
+<div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
+    <span id="@Model.Recipe.RecipeId"></span>
 
-@foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
-{
-    <h4>@Html.DisplayFor(modelItem => comment.Critique)</h4> 
+    <div class="card-header">
+        <h4 style="margin: 0px;">
+            <p style="margin: 0px;">
+                @Html.DisplayFor(modelItem => Model.Recipe.Title)
+            </p>
+        </h4>
+    </div>
+
+    <div class="card-body">
+        <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@Model.Recipe.User.UserId">
+            @Html.DisplayFor(modelItem => Model.Recipe.User.Username)
+        </a>
+        <span class="card-text">STUFF FOR VOTING</span>
+    </div>
+
+    <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+
+    <div class="card-body">
+        <p class="card-text">@Html.DisplayFor(modelItem => Model.Recipe.Essay)</p>
+        <br />
+
+        <p>
+            @Html.DisplayFor(modelItem => Model.Recipe.Preparation)
+        </p>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        @foreach (var ingredient in Model.Recipe.Ingredients)
+        {
+                <li class="list-group-item">
+                    @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
+                </li>
+        }
+    </ul>
     <br />
-    <br />
-}
+
+
+    @foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
+    {
+        <div class="card text-white bg-info mb-3" style="width: auto;">
+            <div class="card-header">
+
+                @Html.DisplayFor(modelItem => comment.User.Username)
+                        <span>stuff for voting</span>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-text">
+                    @Html.DisplayFor(modelItem => comment.Critique)
+                </h5>
+            </div>
+
+            <div class="card-footer">
+                @Html.DisplayFor(modelItem => comment.CommentPosted)
+            </div>
+
+        </div>
+    }
+
+    <div class="card-footer text-muted">
+        @Html.DisplayFor(modelItem => Model.Recipe.PostingDate)
+    </div>
+
+</div>

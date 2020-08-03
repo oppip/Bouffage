@@ -3,61 +3,93 @@
     ViewData["Title"] = Html.DisplayFor(modelItem => Model.User.Username);
 }
 
-    <div class="card bg-warning" style="width: 100%; margin-left: 7px;">
-        <div class="card-body">
-            <div class="inline">
-                <h4 class="card-title">@Html.DisplayFor(modelItem => Model.User.Username)</h4>
-                <h6 class="card-subtitle mb-2 text-muted">@Html.DisplayFor(modelItem => Model.User.Email)</h6>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<div class="card bg-warning" style="width: 100%; margin-left: 7px;">
+    <div class="card-body">
+        <div class="inline">
+            <h4 class="card-title">@Html.DisplayFor(modelItem => Model.User.Username)</h4>
+            <h6 class="card-subtitle mb-2 text-muted">@Html.DisplayFor(modelItem => Model.User.Email)</h6>
+        </div>
+        <div class="inline">
+            <div>
+                <p class="card-text inline"> Following: @Html.DisplayFor(modelItem => Model.User.Following)</p>
+                <p class="card-text inline"> Followers: @Html.DisplayFor(modelItem => Model.User.Followers)</p>
             </div>
-            <div class="inline">
-                <div>
-                    <p class="card-text inline"> Following: @Html.DisplayFor(modelItem => Model.User.Following)</p>
-                    <p class="card-text inline"> Followers: @Html.DisplayFor(modelItem => Model.User.Followers)</p>
-                </div>
-                <h4 style="margin: auto; display: inline-block">
-                    <a class="follow" asp-controller="User" asp-action="Follow" asp-route-id="@Model.User.UserId">
-                       Follow
-                    </a>
-                </h4>
-            </div>
-            <div class="inline" style="width: 30%">
-                <p style="text-align:center">
-                    Karma: @Html.DisplayFor(modelItem => Model.User.Karma)
-                </p>
-                <div class="progress justify-content-end" id="progress-bar">
-                    @{ var percentage = 0.0;
-                        foreach (var item in Model.Recipes)
-                        {
-                            percentage += item.Upvotes;
-                            percentage += item.Downvotes;
-                        }
-                        foreach (var item in Model.Comments)
-                        {
-                            percentage += item.Useful;
-                            percentage += item.Useless;
-                        }
-                        var karma = Model.User.Karma;
-
-                        percentage = (double) karma / percentage;
-                        percentage *= 100;
-                        percentage = Math.Round(percentage);
-
-                        if (percentage >200)
-                        {
-                            Random r = new Random();
-                            int per = r.Next(100);          //for those who dont have posts just for test
-                            percentage = (double) per;
-                        }
-                        percentage = 100 - percentage;
+            <h4 style="margin: auto; display: inline-block">
+                <a class="follow" asp-controller="User" asp-action="Follow" asp-route-id="@Model.User.UserId">
+                    Follow
+                </a>
+            </h4>
+        </div>
+        <div class="inline" style="width: 30%">
+            <p style="text-align:center">
+                Karma: @Html.DisplayFor(modelItem => Model.User.Karma)
+            </p>
+            <div class="progress justify-content-end" id="progress-bar">
+                @{ var percentage = 0.0;
+                    foreach (var item in Model.Recipes)
+                    {
+                        percentage += item.Upvotes;
+                        percentage += item.Downvotes;
                     }
-                    <div class="progress-bar bg-white" role="progressbar" style="width: @percentage%;" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            </div>
+                    foreach (var item in Model.Comments)
+                    {
+                        percentage += item.Useful;
+                        percentage += item.Useless;
+                    }
+                    var karma = Model.User.Karma;
 
-            <a href="#" class="card-link">Card link</a>
+                    percentage = (double)karma / percentage;
+                    percentage *= 100;
+                    percentage = Math.Round(percentage);
+
+                    if (percentage > 200)
+                    {
+                        Random r = new Random();
+                        int per = r.Next(100);          //for those who dont have posts just for test
+                        percentage = (double)per;
+                    }
+                    percentage = 100 - percentage;
+                }
+                <div class="progress-bar bg-white" role="progressbar" style="width: @percentage%;" aria-valuenow="@percentage" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+
+        <div class="inline" style="float: right">
+            @{
+                var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+                string[] list = { "", "", "" };
+                if (cookie != null)
+                {
+                    list = cookie.Split("&%&");
+                }
+
+                var Useruserid = list[0];
+                var Userusername = list[1];
+                var UserRole = list[2];
+
+                if (UserRole == "Admin")
+                {
+                    if (Model.User.Role == "Admin")
+                    {
+                        <a class="cancelbtn" asp-area="" asp-controller="Users" asp-action="RemoveAdminStatus" asp-route-id=@Model.User.UserId>Remove admin status</a>
+                    }
+                    else
+                    {
+                        <a class="cancelbtn" asp-area="" asp-controller="Users" asp-action="MakeUserAdmin" asp-route-id=@Model.User.UserId>Make user admin</a>
+                    }
+                    <a class="cancelbtn" asp-area="" asp-controller="Users" asp-action="DeleteAccountA" asp-route-id=@Model.User.UserId>Remove user</a>
+                }
+
+                if (Useruserid == Model.User.UserId.ToString())
+                {
+                    <a class="cancelbtn" style="position: absolute; bottom: 10px; right: 20px;" asp-area="" asp-controller="Users" asp-action="DeleteAccount" asp-route-id=@Useruserid>Delete my account</a>
+                }
+            }
         </div>
     </div>
-    <br />
+</div>
+<br />
 <div>
     <div class="inline" style="width: 59%; float: left;">
         @foreach (var item in Model.Recipes)
@@ -67,7 +99,7 @@
 
                 <div class="card-header">
                     <h4 style="margin: 0px; display: inline-block">
-                        <a class="username" asp-controller="Recipes" asp-action="ShowThisRecipe" asp-route-id="@item.RecipeId">
+                        <a class="username inline" asp-controller="Recipes" asp-action="ShowThisRecipe" asp-route-id="@item.RecipeId">
                             @Html.DisplayFor(modelItem => item.Title)
                         </a>
                     </h4>
@@ -133,8 +165,8 @@
             <br />
         }
     </div>
- </div>
+</div>
 <div style="clear: both"></div>
 
-<!--select recipe da se pokaze od kaj korisnikot tocno toj recep
+<!--select recipe da se pokaze od kaj korisnikot tocno toj recept
     -->

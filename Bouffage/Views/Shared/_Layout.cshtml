@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/Modal.css" />
 </head>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <body>
     <!-- The Modal -->
     <div id="id01" class="modal">
@@ -16,22 +17,45 @@
               class="close" title="Close Modal">&times;</span>
 
         <!-- Modal Content -->
-        <form class="modal-content animate" asp-controller="Users" asp-action="Authenticate" method="POST">
+        <form class="modal-content animate" style="margin-top: 3%;" asp-controller="Users" asp-action="Authenticate" method="POST">
+            @{
+                var errors = HttpContextAccessor.HttpContext.Request.Cookies["error"];
+                string[] errorlist = { "", "", "" };
+                if (errors != null)
+                {
+                    errorlist = errors.Split("&%&");
+                }
+                var email = errorlist[1];
+                var error = errorlist[0];
+                Microsoft.AspNetCore.Http.CookieOptions cookieOptions = new Microsoft.AspNetCore.Http.CookieOptions();
+                cookieOptions.Expires = DateTime.Now.AddDays(-1);
+                @if (errors != null)
+                {
+                    HttpContextAccessor.HttpContext.Response.Cookies.Append("MyCookie", "", cookieOptions);
+                    HttpContextAccessor.HttpContext.Response.Cookies.Append("error", "", cookieOptions);
+                }
 
-            <div class="container">
-                <label for="Username"><b>Email</b></label>
-                <input type="text" placeholder="Enter email" name="Username" required>
-                <br>
+                if (email == null)
+                {
+                    email = "";
+                }
+                <div class="container">
+                    <label for="Email"><b>Е-пошта</b></label>
+                    <input type="text" placeholder="Enter email" name="Email" value="@email" required>
+                    <br>
+                    @if (error != null)
+                    {
+                        <h6>@error</h6>
+                    }
+                    <label for="Password"><b>Лозинка</b></label>
+                    <input type="password" placeholder="Enter Password" name="Password" required>
 
-                <label for="Password"><b>Password</b></label>
-                <input type="password" placeholder="Enter Password" name="Password" required>
-
-                <button type="submit">Login</button>
-            </div>
+                </div>
+            }
 
             <div class="container" style="background-color:#f1f1f1">
                 <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-                <span class="psw">Forgot <a href="#">password?</a></span>
+                <button type="submit" style="float: right;">Login</button>
             </div>
         </form>
         <span onclick="document.getElementById('id01').style.display='none'"
@@ -52,9 +76,10 @@
 
 
     <header>
+         
         <nav class="navbar navbar-expand-lg navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" >
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/Images/bouffage.png" alt="Bouffage" style="max-height: 45px;" />
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -74,8 +99,47 @@
                         </li>
                     </ul>
                 </div>
+                @{
+                    var showlogin = ViewData["show"];
+                    if (showlogin == null)
+                    {
+                        showlogin = false;
+                    }
+                    if ((bool)showlogin == true)
+                    {
+                        <script>
+                            document.getElementById('id01').style.display = 'block';
+                        </script>
+                    }
 
-                <input type="button" class="nav-link text-dark" value="Log in" id="login-button" onclick="document.getElementById('id01').style.display='block'" />
+                    var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+                    string[] list = { "", "", "" };
+                    if (cookie != null)
+                    {
+                        list = cookie.Split("&%&");
+                    }
+
+                    var Useruserid = list[0];
+                    var Userusername = list[1];
+                    var UserRole = list[2];
+
+                    if (Userusername == "")
+                    {
+                        <input type="button" class="nav-link text-dark changeable"  value="Log in" id="login-button" onclick="document.getElementById('id01').style.display='block'" />
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav changeable">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" style="right: 0" asp-area="" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id=@Useruserid>@Userusername</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Logout">Log out</a>
+                            </li>
+                        </ul>
+                    }
+
+                }
             </div>
         </nav>
     </header>

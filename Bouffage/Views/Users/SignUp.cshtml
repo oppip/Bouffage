@@ -1,0 +1,76 @@
+﻿@model Bouffage.ViewModels.SignUpViewModel
+@{
+    ViewData["Title"] = "Sign up";
+    if(!ViewData.ContainsKey("Error"))
+    {
+        ViewData["Error"] = "";
+    }
+}
+
+
+<!-- The Modal -->
+<div id="id01" class="modal" style="display: block; margin-top: 3%">
+
+    <!-- Modal Content -->
+    <form class="modal-content animate" style="width: 60%" asp-controller="Users" asp-action="SignUp" method="POST">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="column">
+            <div class="container left">
+                <div class="form-group">
+                    <label asp-for="Email" class="control-label">Е-пошта<p class="showerror inline">@ViewBag.eemail</p></label>
+                    <input asp-for="Email" class="form-control" placeholder="Внесете ја вашата е-пошта" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" placeholder="Внесете корисничко име" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label">Лозинка<p class="showerror inline">@ViewBag.epassword</p></label>
+                    <input asp-for="Password" class="form-control" placeholder="Внесете лозинка" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmedPassword" class="control-label">Потврдете ја лозинката<p class="showerror inline">@ViewBag.epassword</p></label>
+                    <input asp-for="ConfirmedPassword" class="form-control" placeholder="Внесете ја повторно истата лозинка" />
+                    <span asp-validation-for="ConfirmedPassword" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="container left">
+                <h4>За да може да ги користите сите алаткви, ве молиме креирајте профил.</h4>
+                <label for="profile_picture"><b>Поставете слика: </b></label>
+                <!-- <input type="file" name="profile_picture" id="profile_picture"> -->
+
+            </div>
+            <footer>
+                <button type="submit" class="signup">Sign up</button>
+            </footer>
+        </div>
+    </form>
+</div>
+
+@if (ViewBag.epassword != null || @ViewBag.eemail != null)
+{
+    <div id="errormsg" class="modal" style="display:block;">
+        <div class="modal-content column">
+            <h5 style="text-align:center">Неуспешно креирање на нов профил: </h5>
+            <h6 style="text-align:center">@ViewBag.email</h6>
+            <h6 style="text-align:center">@ViewBag.password</h6>
+        </div>
+    </div>
+
+    <script>
+        // Get the modal
+        var modal = document.getElementById('errormsg');
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+}

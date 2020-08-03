@@ -8,6 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
 using Bouffage.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using BC = BCrypt.Net.BCrypt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace Bouffage.Controllers
 {
@@ -146,6 +153,7 @@ namespace Bouffage.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize]
         public async Task<IActionResult> GetThisGuysProfile(int? id)
         {
             if (id == null)
@@ -178,11 +186,177 @@ namespace Bouffage.Controllers
             return View(userRecipesVM);
         }
 
-
-
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.UserId == id);
         }
+
+
+        public async Task<IActionResult> Authenticate([FromForm] string Email, [FromForm] string Password)
+        {
+            var _users = await _context.User.ToListAsync();
+            var HashedPassword = BC.HashPassword(Password);
+            var user = _users.SingleOrDefault(x => x.Email == Email && BC.Verify(Password, x.Password));
+            string key = "MyCookie";
+            string value = user.UserId.ToString() + "&%&" + user.Username + "&%&" + user.Role;
+            CookieOptions cookieOptions = new CookieOptions();
+            //cookieOptions.Expires = DateTime.Now.AddMinutes(2);
+            Response.Cookies.Append(key, value, cookieOptions);
+            if (user == null)
+            {
+                var error = "Неточна е-пошта или лозинка&%&" + Email ;
+                ViewBag.email = Email;
+                ViewData["show"] = true;
+                Response.Cookies.Append("error", error, cookieOptions);
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            else
+            {
+                var claims = new List<Claim>
+               {
+                   new Claim(ClaimTypes.Name, Email)
+               };
+                var identity = new ClaimsIdentity(
+                    claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                var props = new AuthenticationProperties();
+                HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme, principal, props).Wait();
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.SignOutAsync();
+            Response.Cookies.Delete("MyCookie");
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult SignUp()
+        {
+            /*var str = "document.getElementById('id01').style.display='block'";
+            return Content(str);*//*
+            ViewData["show"] = true;        //is there a function returntourl for signing up too
+            return View("Index");*/
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignUp(SignUpViewModel user)
+        {
+            if (ModelState.IsValid)
+            {
+                var flag = false;
+                var uniqueness = _context.User.Any(x => x.Email == user.Email);
+                if (user.Password != user.ConfirmedPassword)
+                {
+                    flag = true;
+                    ViewBag.password = "Внесените лозинки не се совпаѓаат";
+                    ViewBag.epassword = "*";
+                }
+                if (uniqueness)
+                {
+                    flag = true;
+                    ViewBag.email = "Внесената е-пошта е веќе искористена";
+                    ViewBag.eemail = "*";
+                }
+                if (flag)
+                {
+                    return View(user);
+                }
+                else
+                {
+                    User newuser = new User
+                    {
+                        Email = user.Email,
+                        Password = BC.HashPassword(user.Password),
+                        Followers = 0,
+                        Following = 0,
+                        Karma = 0,
+                        DateCreated = DateTime.UtcNow,
+                        Username = user.Username,
+                        Role = "User"
+                    };
+                    _context.Add(newuser);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            else
+            {
+                return View(user);
+            }
+        }
+
+        public async Task<IActionResult> MakeUserAdmin(int id)
+        {
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.UserId == id);
+            user.Role = "Admin";
+            try
+                {
+                    _context.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!UserExists(user.UserId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        public async Task<IActionResult> RemoveAdminStatus(int id)
+        {
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.UserId == id);
+            user.Role = "User";
+            try
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(user.UserId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        public async Task<IActionResult> DeleteAccountA(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+            _context.User.Remove(user);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            Response.Cookies.Delete("MyCookie");
+            await HttpContext.SignOutAsync();
+            var user = await _context.User.FindAsync(id);
+            _context.User.Remove(user);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
     }
 }

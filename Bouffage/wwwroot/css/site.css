@@ -133,3 +133,8 @@ body {
 #progress-bar {
     background: linear-gradient(to right, red, orange, yellow, lightseagreen,deepskyblue, springgreen)
 }
+
+.changeable {
+    float: right;
+    max-width: max-content;
+}
