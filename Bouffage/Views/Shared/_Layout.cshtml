@@ -125,7 +125,9 @@
 
                     if (Userusername == "")
                     {
-                        <input type="button" class="nav-link text-dark changeable"  value="Log in" id="login-button" onclick="document.getElementById('id01').style.display='block'" />
+                        <a class="nav-link text-dark changeable" id="login-button" asp-area="" asp-controller="Users" asp-action="SignUp"> Sign up </a>
+
+                        <input type="button" class="nav-link text-dark changeable" value="Log in" id="login-button" onclick="document.getElementById('id01').style.display='block'" />
                     }
                     else
                     {

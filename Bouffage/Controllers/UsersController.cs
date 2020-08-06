@@ -283,6 +283,24 @@ namespace Bouffage.Controllers
                     };
                     _context.Add(newuser);
                     await _context.SaveChangesAsync();
+
+                    //automatically log in
+                    string key = "MyCookie";
+                    string value = newuser.UserId.ToString() + "&%&" + user.Username + "&%&" + user.Role;
+                    CookieOptions cookieOptions = new CookieOptions();
+                    //cookieOptions.Expires = DateTime.Now.AddMinutes(2);
+                    Response.Cookies.Append(key, value, cookieOptions);
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.Email)
+                    };
+                    var identity = new ClaimsIdentity(
+                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var principal = new ClaimsPrincipal(identity);
+                    var props = new AuthenticationProperties();
+                    HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme, principal, props).Wait();
+
                     return RedirectToAction("Index", "Home");
                 }
             }
