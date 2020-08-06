@@ -11,55 +11,55 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
 @foreach (var item in Model.Recipes)
 {
-<div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
-    <span id="@item.RecipeId"></span>
+    <div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
+        <span id="@item.RecipeId"></span>
 
-    <div class="card-header">
-        <h4 style="margin: 0px;">
-            <p style="margin: 0px;">
-                @Html.DisplayFor(modelItem => item.Title)
-            </p>
-        </h4>
-    </div>
+        <div class="card-header">
+            <h4 style="margin: 0px;">
+                <p style="margin: 0px;">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </p>
+            </h4>
+        </div>
 
-    <div class="card-body">
+        <div class="card-body">
             <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
                 @Html.DisplayFor(modelItem => item.User.Username)
             </a>
-        <span class="card-text">STUFF FOR VOTING</span>
-    </div>
+            <span class="card-text">STUFF FOR VOTING</span>
+        </div>
 
-    <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+        <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
 
-    <div class="card-body">
-        <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
-        <br/>
+        <div class="card-body">
+            <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
+            <br />
 
-        <p>
-            @Html.DisplayFor(modelItem => item.Preparation)
-        </p>
-    </div>
+            <p>
+                @Html.DisplayFor(modelItem => item.Preparation)
+            </p>
+        </div>
 
-    <ul class="list-group list-group-flush">
-        @foreach (var ingredient in Model.Ingredients)
-        {
-            @if (ingredient.RecipeId == item.RecipeId)
+        <ul class="list-group list-group-flush">
+            @foreach (var ingredient in Model.Ingredients)
             {
-                <li class="list-group-item">
-                    @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
-                </li>
+                @if (ingredient.RecipeId == item.RecipeId)
+                {
+                    <li class="list-group-item">
+                        @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
+                    </li>
+                }
             }
-        }
-    </ul>
-    <br />
+        </ul>
+        <br />
 
 
-    @foreach (var comment in Model.Comments)
-    {
+        @foreach (var comment in Model.Comments)
+        {
             @if (comment.CommentOnRecipeId == item.RecipeId)
             {
                 <div class="card text-white bg-info mb-3" style="width: auto;">
@@ -67,28 +67,66 @@
                         @foreach (var user in Model.Users)
                             @if (comment.UserCommentedId == user.UserId)
                             {
-                              @Html.DisplayFor(modelItem => user.Username) 
+                                @Html.DisplayFor(modelItem => user.Username)
 
-                             <span>stuff for voting</span>
-                        
-                            }
+                                <span>stuff for voting</span>
+
+                                }
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-text">
+                                @Html.DisplayFor(modelItem => comment.Critique)
+                            </h5>
+                        </div>
+                        <div class="card-footer">
+                            @Html.DisplayFor(modelItem => comment.CommentPosted)
+                        </div>
                     </div>
-                    <div class="card-body">
-                       <h5 class="card-text">
-                           @Html.DisplayFor(modelItem => comment.Critique)
-                       </h5>
-                    </div>
-                    <div class="card-footer">
-                        @Html.DisplayFor(modelItem => comment.CommentPosted)
-                    </div>
-                </div>
             }
-    }
+        }
+        @{ 
+            var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
 
-    <div class="card-footer text-muted">
-    @Html.DisplayFor(modelItem => item.PostingDate)
+            var Useruserid = list[0];
+            var Userusername = list[1];
+            var UserRole = list[2];
+
+            var time = DateTime.Now;
+
+            <div class="card text-white bg-info mb-3" style="width: auto;">
+                <div class="card-body">
+                    <form asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Comment style="border: none" method="POST">
+                        <input type="hidden" name="recipe_commented" value=@item.RecipeId>
+                        <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a comment...">
+
+                        <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
+                            <button type="submit" class="leavecomment" >Comment!</button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="leavecomment dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Question>Question</a>
+                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Tip>Tip</a>
+                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Review>Review</a>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </form>
+                </div>
+            </div>
+          }
+
+        <div class="card-footer text-muted">
+            @Html.DisplayFor(modelItem => item.PostingDate)
+        </div>
+
     </div>
-
-</div>
 
 }

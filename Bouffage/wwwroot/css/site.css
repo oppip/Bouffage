@@ -138,3 +138,24 @@ body {
     float: right;
     max-width: max-content;
 }
+
+.comment {
+    width: 45%;
+    margin: unset;
+    background-color: transparent;
+}
+
+.comment::-webkit-input-placeholder
+{
+    color: coral;
+    font-size: 1.3em;
+}
+
+.leavecomment
+{
+    width: unset; 
+    margin-right: 10px;
+    background-color: coral;
+    color: teal;
+    float: right;
+}

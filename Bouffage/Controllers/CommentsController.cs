@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bouffage.Controllers
 {
@@ -156,5 +157,46 @@ namespace Bouffage.Controllers
         {
             return _context.Comment.Any(e => e.CommentId == id);
         }
+
+
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> LeaveAComment([FromForm] int recipe_commented, [FromForm] string critique, int? replyid, [FromForm] Comment.TypeOfC typeofcomment)
+        {
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+
+            Comment comment = new Comment
+            {
+                CommentOnRecipeId = recipe_commented,
+                Critique = critique,
+                CommentPosted = DateTime.Now,
+                TypeOfComments = typeofcomment,
+                UserCommentedId = Useruserid,
+                Useful = 0,
+                Useless = 0
+            };
+
+            if(replyid != null)
+            {
+                comment.ReplyCommentId = replyid;
+            }
+
+            _context.Add(comment);
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+
+        }
+
+
     }
 }
