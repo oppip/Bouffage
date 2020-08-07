@@ -161,13 +161,13 @@ namespace Bouffage.Controllers
 
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> LeaveAComment([FromForm] int recipe_commented, [FromForm] string critique, int? replyid, [FromForm] Comment.TypeOfC typeofcomment)
+        public async Task<IActionResult> LeaveAComment([FromForm] int recipe_commented, [FromForm] string critique, int? replyid, [FromForm] Comment.TypeOfC type)
         {
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };
             if (cookie != null)
             {
-                list = cookie.Split("&%&");
+                list = cookie.Split("&%&"); 
             }
 
             int Useruserid = 0;
@@ -180,7 +180,7 @@ namespace Bouffage.Controllers
                 CommentOnRecipeId = recipe_commented,
                 Critique = critique,
                 CommentPosted = DateTime.Now,
-                TypeOfComments = typeofcomment,
+                TypeOfComments = type,
                 UserCommentedId = Useruserid,
                 Useful = 0,
                 Useless = 0
@@ -196,7 +196,5 @@ namespace Bouffage.Controllers
             return Redirect(Request.Headers["Referer"].ToString());
 
         }
-
-
     }
 }

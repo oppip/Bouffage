@@ -3,71 +3,125 @@
 @{
     ViewData["Title"] = Model.Recipe.Title;
 }
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
-<div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
-    <span id="@Model.Recipe.RecipeId"></span>
+    <div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
+        <span id="@Model.Recipe.RecipeId"></span>
 
-    <div class="card-header">
-        <h4 style="margin: 0px;">
-            <p style="margin: 0px;">
-                @Html.DisplayFor(modelItem => Model.Recipe.Title)
+        <div class="card-header">
+            <h4 style="margin: 0px;">
+                <p style="margin: 0px;">
+                    @Html.DisplayFor(modelItem => Model.Recipe.Title)
+                </p>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@Model.Recipe.User.UserId">
+                @Html.DisplayFor(modelItem => Model.Recipe.User.Username)
+            </a>
+            @{ 
+                var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+                string[] list = { "", "", "" };
+                if (cookie != null)
+                {
+                    list = cookie.Split("&%&");
+                }
+
+                var Useruserid = list[0];
+                var Userusername = list[1];
+                var UserRole = list[2];
+
+                var time = DateTime.Now;
+                string upvote = "u%%" + Model.Recipe.User.UserId;
+                string downvote = "d%%" + Useruserid;
+
+                <form class="voting" asp-action="VoteRecipe" asp-controller="VoteRecipes" method="POST">
+                    <input type="hidden" name="recipe" value=@Model.Recipe.RecipeId />
+
+                    <label id="arrow">
+                        <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                        <img src="~/Images/uvote.png" alt="placeholder">
+                    </label>
+
+                    <label id="arrow">
+                        <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                        <img src="~/Images/dvote.png" alt="placeholder">
+                    </label>
+                </form>
+             }
+        </div>
+
+        <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+
+        <div class="card-body">
+            <p class="card-text">@Html.DisplayFor(modelItem => Model.Recipe.Essay)</p>
+            <br />
+
+            <p>
+                @Html.DisplayFor(modelItem => Model.Recipe.Preparation)
             </p>
-        </h4>
-    </div>
+        </div>
 
-    <div class="card-body">
-        <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@Model.Recipe.User.UserId">
-            @Html.DisplayFor(modelItem => Model.Recipe.User.Username)
-        </a>
-        <span class="card-text">STUFF FOR VOTING</span>
-    </div>
-
-    <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
-
-    <div class="card-body">
-        <p class="card-text">@Html.DisplayFor(modelItem => Model.Recipe.Essay)</p>
-        <br />
-
-        <p>
-            @Html.DisplayFor(modelItem => Model.Recipe.Preparation)
-        </p>
-    </div>
-
-    <ul class="list-group list-group-flush">
-        @foreach (var ingredient in Model.Recipe.Ingredients)
-        {
+        <ul class="list-group list-group-flush">
+            @foreach (var ingredient in Model.Recipe.Ingredients)
+            {
                 <li class="list-group-item">
                     @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
                 </li>
+            }
+        </ul>
+        <br />
+
+
+        @foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
+        {
+            <div class="card text-white bg-info mb-3" style="width: auto;">
+                <div class="card-header">
+
+                    @Html.DisplayFor(modelItem => comment.User.Username)
+                    <span>stuff for voting</span>
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-text">
+                        @Html.DisplayFor(modelItem => comment.Critique)
+                    </h5>
+                </div>
+
+                <div class="card-footer">
+                    @Html.DisplayFor(modelItem => comment.CommentPosted)
+                </div>
+
+            </div>
         }
-    </ul>
-    <br />
 
+        @{
+            <div class="card text-white bg-info mb-3" style="width: auto;">
+                <div class="card-body">
+                    <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">
+                        <input type="hidden" name="recipe_commented" value=@Model.Recipe.RecipeId>
+                        <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a comment...">
 
-    @foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
-    {
-        <div class="card text-white bg-info mb-3" style="width: auto;">
-            <div class="card-header">
-
-                @Html.DisplayFor(modelItem => comment.User.Username)
-                        <span>stuff for voting</span>
+                        <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
+                            <button type="submit" name="type" class="leavecomment" value=@Comment.TypeOfC.Comment>Comment!</button>
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="leavecomment dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Question>Question</button>
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Tip>Tip</button>
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Review>Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
+        }
 
-            <div class="card-body">
-                <h5 class="card-text">
-                    @Html.DisplayFor(modelItem => comment.Critique)
-                </h5>
-            </div>
 
-            <div class="card-footer">
-                @Html.DisplayFor(modelItem => comment.CommentPosted)
-            </div>
-
+        <div class="card-footer text-muted">
+            @Html.DisplayFor(modelItem => Model.Recipe.PostingDate)
         </div>
-    }
 
-    <div class="card-footer text-muted">
-        @Html.DisplayFor(modelItem => Model.Recipe.PostingDate)
     </div>
-
-</div>

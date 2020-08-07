@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Policy;
 
 namespace Bouffage.Controllers
 {
@@ -161,6 +163,93 @@ namespace Bouffage.Controllers
         private bool VoteRecipeExists(int id)
         {
             return _context.VoteRecipe.Any(e => e.VoteRecipeId == id);
+        }
+
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> VoteRecipe([FromForm] int recipe, [FromForm] string vote)
+        {
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+            string[] v = vote.Split("&%&");
+            string u_or_d = v[0];
+
+            int userkarma = 0;
+            Int32.TryParse(v[1], out userkarma);
+
+            VoteRecipe vr = new VoteRecipe
+            {
+                RecipeGotVoted = recipe,
+                UserVotedThisRecipe = Useruserid,
+                UpOrDown = u_or_d[0]
+            };
+            var user = await _context.User.FirstOrDefaultAsync(m => m.UserId == userkarma);
+            var recipekarma = await _context.Recipe.FirstOrDefaultAsync(m => m.RecipeId == recipe);
+            var hashevoted = await _context.VoteRecipe.FirstOrDefaultAsync(m => m.VoteRecipeId == recipe && m.UserVotedThisRecipe == Useruserid);
+            if (hashevoted == null)
+            {
+                if (vr.UpOrDown == 'u')
+                {
+                    user.Karma += 1;
+                    recipekarma.Upvotes += 1;
+                }
+                else
+                {
+                    user.Karma -= 1;
+                    recipekarma.Upvotes -= 1;
+                }
+            }
+            else
+            {
+                if(hashevoted.UpOrDown == 'u')
+                {
+                    if (vr.UpOrDown == 'u')
+                    {
+                        user.Karma -= 1;
+                        recipekarma.Upvotes -= 1;
+                        _context.VoteRecipe.Remove(hashevoted);
+                    }
+                    else
+                    {
+                        user.Karma -= 2;
+                        recipekarma.Upvotes -= 2;
+                        hashevoted.UpOrDown = 'd';
+                        _context.VoteRecipe.Update(hashevoted);
+                    }
+                }
+                else
+                {
+                    if (vr.UpOrDown == 'u')
+                    {
+                        user.Karma += 2;
+                        recipekarma.Upvotes += 2;
+                        hashevoted.UpOrDown = 'u';
+                        _context.VoteRecipe.Update(hashevoted);                        
+                    }
+                    else
+                    {
+                        user.Karma += 1;
+                        recipekarma.Upvotes += 1;
+                        _context.VoteRecipe.Remove(hashevoted);
+                    }
+                }
+            }
+
+            _context.Add(vr);
+            _context.Update(user);
+            _context.Update(recipekarma);
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+
         }
     }
 }

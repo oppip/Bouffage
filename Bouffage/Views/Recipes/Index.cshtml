@@ -100,24 +100,21 @@
 
             <div class="card text-white bg-info mb-3" style="width: auto;">
                 <div class="card-body">
-                    <form asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Comment style="border: none" method="POST">
+                    <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">
                         <input type="hidden" name="recipe_commented" value=@item.RecipeId>
                         <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a comment...">
 
                         <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
-                            <button type="submit" class="leavecomment" >Comment!</button>
+                            <button type="submit" name="type" class="leavecomment" value=@Comment.TypeOfC.Comment >Comment!</button>
                             <div class="btn-group" role="group">
                                 <button id="btnGroupDrop1" type="button" class="leavecomment dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Question>Question</a>
-                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Tip>Tip</a>
-                                    <a class="dropdown-item" asp-action="LeaveAComment" asp-controller="Comments" asp-route-typeofcomment=@Comment.TypeOfC.Review>Review</a>
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Question>Question</button>
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Tip>Tip</button>
+                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Review>Review</button>
                                 </div>
                             </div>
                         </div>
-
-
-
                     </form>
                 </div>
             </div>
