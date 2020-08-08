@@ -98,7 +98,7 @@ namespace Bouffage.Data
                 builder.Entity<VoteRecipe>()
                    .HasOne<Recipe>(p => p.Recipe)
                    .WithMany(p => p.UsersThatVotedRecipe)
-                   .HasForeignKey(p => p.UserVotedThisRecipe).OnDelete(DeleteBehavior.NoAction);
+                   .HasForeignKey(p => p.RecipeGotVoted).OnDelete(DeleteBehavior.NoAction);
             }
 
             { //junction table for voting comments
@@ -109,7 +109,7 @@ namespace Bouffage.Data
                 builder.Entity<VoteComment>()
                    .HasOne<Comment>(p => p.Comment)
                    .WithMany(p => p.UsersThatVotedComment)
-                   .HasForeignKey(p => p.UserVotedThisComment).OnDelete(DeleteBehavior.NoAction);
+                   .HasForeignKey(p => p.CommentGotVoted).OnDelete(DeleteBehavior.NoAction);
             }
         }
 

@@ -4,14 +4,16 @@ using Bouffage.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Bouffage.Migrations
 {
     [DbContext(typeof(BouffageContext))]
-    partial class BouffageContextModelSnapshot : ModelSnapshot
+    [Migration("20200808191905_Fixed_following_relation")]
+    partial class Fixed_following_relation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -534,14 +536,14 @@ namespace Bouffage.Migrations
 
             modelBuilder.Entity("Bouffage.Models.Following", b =>
                 {
-                    b.HasOne("Bouffage.Models.User", "UserFollowee")
-                        .WithMany("IFollow")
+                    b.HasOne("Bouffage.Models.User", "UserFollowing")
+                        .WithMany("FollowMe")
                         .HasForeignKey("UserFolloweeId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Bouffage.Models.User", "UserFollowing")
-                        .WithMany("FollowMe")
+                    b.HasOne("Bouffage.Models.User", "UserFollowee")
+                        .WithMany("IFollow")
                         .HasForeignKey("UserFollowingId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();

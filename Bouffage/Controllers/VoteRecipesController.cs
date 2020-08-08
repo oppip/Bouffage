@@ -182,7 +182,7 @@ namespace Bouffage.Controllers
             var UserRole = list[2];
             string[] v = vote.Split("&%&");
             string u_or_d = v[0];
-
+            
             int userkarma = 0;
             Int32.TryParse(v[1], out userkarma);
 
@@ -194,7 +194,7 @@ namespace Bouffage.Controllers
             };
             var user = await _context.User.FirstOrDefaultAsync(m => m.UserId == userkarma);
             var recipekarma = await _context.Recipe.FirstOrDefaultAsync(m => m.RecipeId == recipe);
-            var hashevoted = await _context.VoteRecipe.FirstOrDefaultAsync(m => m.VoteRecipeId == recipe && m.UserVotedThisRecipe == Useruserid);
+            var hashevoted = await _context.VoteRecipe.FirstOrDefaultAsync(m => m.RecipeGotVoted == recipe && m.UserVotedThisRecipe == Useruserid);
             if (hashevoted == null)
             {
                 if (vr.UpOrDown == 'u')
@@ -205,8 +205,9 @@ namespace Bouffage.Controllers
                 else
                 {
                     user.Karma -= 1;
-                    recipekarma.Upvotes -= 1;
+                    recipekarma.Downvotes += 1;
                 }
+                _context.Add(vr);
             }
             else
             {
@@ -221,7 +222,8 @@ namespace Bouffage.Controllers
                     else
                     {
                         user.Karma -= 2;
-                        recipekarma.Upvotes -= 2;
+                        recipekarma.Upvotes -= 1;
+                        recipekarma.Downvotes += 1;
                         hashevoted.UpOrDown = 'd';
                         _context.VoteRecipe.Update(hashevoted);
                     }
@@ -231,24 +233,31 @@ namespace Bouffage.Controllers
                     if (vr.UpOrDown == 'u')
                     {
                         user.Karma += 2;
-                        recipekarma.Upvotes += 2;
+                        recipekarma.Upvotes += 1;
+                        recipekarma.Downvotes -= 1;
                         hashevoted.UpOrDown = 'u';
                         _context.VoteRecipe.Update(hashevoted);                        
                     }
                     else
                     {
                         user.Karma += 1;
-                        recipekarma.Upvotes += 1;
+                        recipekarma.Downvotes -= 1;
                         _context.VoteRecipe.Remove(hashevoted);
                     }
                 }
             }
-
-            _context.Add(vr);
             _context.Update(user);
             _context.Update(recipekarma);
             await _context.SaveChangesAsync();
-            return Redirect(Request.Headers["Referer"].ToString());
+            if (v.Length == 3)
+            {
+                return Redirect(Request.Headers["Referer"].ToString() + "#"+v[2]);
+            }
+            else
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            
 
         }
     }

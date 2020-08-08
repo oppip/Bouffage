@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bouffage.Controllers
 {
@@ -161,6 +162,55 @@ namespace Bouffage.Controllers
         private bool FollowingExists(int id)
         {
             return _context.Following.Any(e => e.FollowingId == id);
+        }
+
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Follow( int userfollowed)
+        {
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+
+            Following follow = new Following
+            {
+                UserFollowingId = Useruserid,
+                UserFolloweeId = userfollowed,
+                DateFollowed = DateTime.UtcNow
+            };
+            _context.Add(follow);
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Unfollow( int userunfollowed)
+        {
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+
+            var removefollowing = _context.Following.FirstOrDefaultAsync(m => m.UserFolloweeId == userunfollowed && m.UserFollowingId == Useruserid);
+            _context.Remove(removefollowing);
+            await _context.SaveChangesAsync();
+            return Redirect(Request.Headers["Referer"].ToString());
         }
     }
 }

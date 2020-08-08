@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bouffage.Controllers
 {
@@ -162,5 +163,104 @@ namespace Bouffage.Controllers
         {
             return _context.VoteComment.Any(e => e.VoteCommentId == id);
         }
+
+
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> VoteComment([FromForm] int comment, [FromForm] string vote)
+        {
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+            string[] v = vote.Split("&%&");
+            string u_or_d = v[0];
+
+            int userkarma = 0;
+            Int32.TryParse(v[1], out userkarma);
+
+            VoteComment vc = new VoteComment
+            {
+                UserVotedThisComment = Useruserid,
+                CommentGotVoted = comment,
+                UpOrDown = u_or_d[0]
+            };
+            var user = await _context.User.FirstOrDefaultAsync(m => m.UserId == userkarma);
+            var commentkarma = await _context.Comment.FirstOrDefaultAsync(m => m.CommentId == comment);
+            var hashevoted = await _context.VoteComment.FirstOrDefaultAsync(m => m.CommentGotVoted == comment && m.UserVotedThisComment == Useruserid);
+            if (hashevoted == null)
+            {
+                if (vc.UpOrDown == 'u')
+                {
+                    user.Karma += 1;
+                    commentkarma.Useful += 1;
+                }
+                else
+                {
+                    user.Karma -= 1;
+                    commentkarma.Useless += 1;
+                }
+                _context.Add(vc);
+            }
+            else
+            {
+                if (hashevoted.UpOrDown == 'u')
+                {
+                    if (vc.UpOrDown == 'u')
+                    {
+                        user.Karma -= 1;
+                        commentkarma.Useful -= 1;
+                        _context.VoteComment.Remove(hashevoted);
+                    }
+                    else
+                    {
+                        user.Karma -= 2;
+                        commentkarma.Useful -= 1;
+                        commentkarma.Useless += 1;
+                        hashevoted.UpOrDown = 'd';
+                        _context.VoteComment.Update(hashevoted);
+                    }
+                }
+                else
+                {
+                    if (vc.UpOrDown == 'u')
+                    {
+                        user.Karma += 2;
+                        commentkarma.Useful += 1;
+                        commentkarma.Useless -= 1;
+                        hashevoted.UpOrDown = 'u';
+                        _context.VoteComment.Update(hashevoted);
+                    }
+                    else
+                    {
+                        user.Karma += 1;
+                        commentkarma.Useless -= 1;
+                        _context.VoteComment.Remove(hashevoted);
+                    }
+                }
+            }
+            _context.Update(user);
+            _context.Update(commentkarma);
+            await _context.SaveChangesAsync();
+            if (v.Length == 3)
+            {
+                return Redirect(Request.Headers["Referer"].ToString() + "#" + v[2]);
+            }
+            else
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+
+        }
+
+
     }
 }

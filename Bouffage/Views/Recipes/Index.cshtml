@@ -30,7 +30,37 @@
             <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
                 @Html.DisplayFor(modelItem => item.User.Username)
             </a>
-            <span class="card-text">STUFF FOR VOTING</span>
+            @{
+                var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+                string[] list = { "", "", "" };
+                if (cookie != null)
+                {
+                    list = cookie.Split("&%&");
+                }
+
+                int Useruserid = 0;
+                Int32.TryParse(list[0], out Useruserid);
+                var Userusername = list[1];
+                var UserRole = list[2];
+
+                var time = DateTime.Now;
+                string upvote = "u&%&" + item.User.UserId + "&%&" + item.RecipeId;
+                string downvote = "d&%&" + item.User.UserId + "&%&" + item.RecipeId;
+
+                <form class="voting" asp-action="VoteRecipe" asp-controller="VoteRecipes" method="POST">
+                    <input type="hidden" name="recipe" value=@item.RecipeId />
+
+                    <label id="arrow">
+                        <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                        <img src="~/Images/uvote.png" alt="placeholder">
+                    </label>
+
+                    <label id="arrow">
+                        <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                        <img src="~/Images/dvote.png" alt="placeholder">
+                    </label>
+                </form>
+            }
         </div>
 
         <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
@@ -69,9 +99,24 @@
                             {
                                 @Html.DisplayFor(modelItem => user.Username)
 
-                                <span>stuff for voting</span>
+                                string comment_upvote = "u&%&" + user.UserId + item.RecipeId;
+                                string comment_downvote = "d&%&" + user.UserId + item.RecipeId;
 
-                                }
+                                <form class="voting" asp-action="VoteComment" asp-controller="VoteComments" method="POST">
+                                    <input type="hidden" name="comment" value=@comment.CommentId />
+
+                                    <label id="arrow">
+                                        <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                                        <img src="~/Images/uvote.png" alt="placeholder">
+                                    </label>
+
+                                    <label id="arrow">
+                                        <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                                        <img src="~/Images/dvote.png" alt="placeholder">
+                                    </label>
+                                </form>
+
+                            }
                         </div>
                         <div class="card-body">
                             <h5 class="card-text">
@@ -84,20 +129,7 @@
                     </div>
             }
         }
-        @{ 
-            var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
-            string[] list = { "", "", "" };
-            if (cookie != null)
-            {
-                list = cookie.Split("&%&");
-            }
-
-            var Useruserid = list[0];
-            var Userusername = list[1];
-            var UserRole = list[2];
-
-            var time = DateTime.Now;
-
+        @{             
             <div class="card text-white bg-info mb-3" style="width: auto;">
                 <div class="card-body">
                     <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">

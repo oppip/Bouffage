@@ -28,13 +28,14 @@
                     list = cookie.Split("&%&");
                 }
 
-                var Useruserid = list[0];
+                int Useruserid = 0;
+                Int32.TryParse(list[0], out Useruserid);
                 var Userusername = list[1];
                 var UserRole = list[2];
 
                 var time = DateTime.Now;
-                string upvote = "u%%" + Model.Recipe.User.UserId;
-                string downvote = "d%%" + Useruserid;
+                string upvote = "u&%&" + Model.Recipe.User.UserId;
+                string downvote = "d&%&" + Model.Recipe.User.UserId;
 
                 <form class="voting" asp-action="VoteRecipe" asp-controller="VoteRecipes" method="POST">
                     <input type="hidden" name="recipe" value=@Model.Recipe.RecipeId />
@@ -76,11 +77,29 @@
 
         @foreach (var comment in Model.Recipe.CommentsOnThisRecipe)
         {
+
             <div class="card text-white bg-info mb-3" style="width: auto;">
                 <div class="card-header">
 
                     @Html.DisplayFor(modelItem => comment.User.Username)
-                    <span>stuff for voting</span>
+                    @{                          
+                        string comment_upvote = "u&%&" + comment.User.UserId;
+                        string comment_downvote = "d&%&" + comment.User.UserId;
+
+                        <form class="voting" asp-action="VoteComment" asp-controller="VoteComments" method="POST">
+                            <input type="hidden" name="comment" value=@comment.CommentId />
+
+                            <label id="arrow">
+                                <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                                <img src="~/Images/uvote.png" alt="placeholder">
+                            </label>
+
+                            <label id="arrow">
+                                <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                                <img src="~/Images/dvote.png" alt="placeholder">
+                            </label>
+                        </form>
+                    }
                 </div>
 
                 <div class="card-body">

@@ -152,8 +152,7 @@ namespace Bouffage.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-        [Authorize]
+                
         public async Task<IActionResult> GetThisGuysProfile(int? id)
         {
             if (id == null)
@@ -169,6 +168,26 @@ namespace Bouffage.Controllers
             recipes = recipes.Where(p => p.UserPostedRecipeId == user.UserId);
             comments = comments.Where(p => p.UserCommentedId == user.UserId);
 
+            var cookie = Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
+            {
+                list = cookie.Split("&%&");
+            }
+
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
+            var following = await _context.Following.FirstOrDefaultAsync(m => m.UserFolloweeId == id && m.UserFollowingId == Useruserid);
+            if (following == null)
+            {
+                ViewBag.followingeachother = false;
+            }
+            else
+            {
+                ViewBag.followingeachother = true;
+            }
 
             UserRecipesViewModel userRecipesVM = new UserRecipesViewModel
             {

@@ -19,13 +19,13 @@ namespace Bouffage.Models
                     return;
                 }
                 context.User.AddRange(
-                    new User { /*UserId = 1,*/ Username = "Вилипче", DateCreated = DateTime.Parse("2017-8-1"), Email = "filip@edu.mk", Password = "jasu", Role = "Admin", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = true },
-                    new User { /*UserId = 2,*/ Username = "Vladko", DateCreated = DateTime.Parse("2017-2-1"), Email = "vlatko@edu.mk", Password = "vlad", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
-                    new User { /*UserId = 3,*/ Username = "Петар", DateCreated = DateTime.Parse("1590-12-9"), Email = "pero@edu.mk", Password = "password", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
-                    new User { /*UserId = 1,*/ Username = "IGOr4E", DateCreated = DateTime.Parse("2007-2-4"), Email = "igorche@edu.mk", Password = "password", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
-                    new User { /*UserId = 1,*/ Username = "Доломир", DateCreated = DateTime.Parse("2017-2-5"), Email = "dolomire@edu.mk", Password = "password", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
-                    new User { /*UserId = 1,*/ Username = "Редбул", DateCreated = DateTime.Parse("2019-8-11"), Email = "redbull@edu.mk", Password = "password", Role = "Admin", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = true },
-                    new User { /*UserId = 1,*/ Username = "Фејт", DateCreated = DateTime.Parse("2000-1-1"), Email = "fate@edu.mk", Password = "password", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false }
+                    new User { /*UserId = 1,*/ Username = "Вилипче", DateCreated = DateTime.Parse("2017-8-1"), Email = "filip@edu.mk", Password = "$2a$11$jZbROFWgRgQB/3WM7bP5Nex5vaD5VVR.dXABr/lKhRWYjGF.TvFW2", Role = "Admin", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = true },
+                    new User { /*UserId = 2,*/ Username = "Vladko", DateCreated = DateTime.Parse("2017-2-1"), Email = "vlatko@edu.mk", Password = "$2a$11$UwDPIFDOAjZ8QQAWbBvAyeYxaUw0IVU2I27XJeHJISeOvhtgm0V.6", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
+                    new User { /*UserId = 3,*/ Username = "Петар", DateCreated = DateTime.Parse("1590-12-9"), Email = "pero@edu.mk", Password = "$2a$11$LJdaK7eLQFQyLViuHkBVF.e.PvHt9YwjmWFVaaT6DWOQ.qcrS/f7K", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
+                    new User { /*UserId = 1,*/ Username = "IGOr4E", DateCreated = DateTime.Parse("2007-2-4"), Email = "igorche@edu.mk", Password = "$2a$11$LJdaK7eLQFQyLViuHkBVF.e.PvHt9YwjmWFVaaT6DWOQ.qcrS/f7K", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
+                    new User { /*UserId = 1,*/ Username = "Доломир", DateCreated = DateTime.Parse("2017-2-5"), Email = "dolomire@edu.mk", Password = "$2a$11$LJdaK7eLQFQyLViuHkBVF.e.PvHt9YwjmWFVaaT6DWOQ.qcrS/f7K", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false },
+                    new User { /*UserId = 1,*/ Username = "Редбул", DateCreated = DateTime.Parse("2019-8-11"), Email = "redbull@edu.mk", Password = "$2a$11$LJdaK7eLQFQyLViuHkBVF.e.PvHt9YwjmWFVaaT6DWOQ.qcrS/f7K", Role = "Admin", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = true },
+                    new User { /*UserId = 1,*/ Username = "Фејт", DateCreated = DateTime.Parse("2000-1-1"), Email = "fate@edu.mk", Password = "$2a$11$LJdaK7eLQFQyLViuHkBVF.e.PvHt9YwjmWFVaaT6DWOQ.qcrS/f7K", Role = "User", Karma = 0, Following = 0, Followers = 0, VerifiedEmail = false }
                     );
                 context.SaveChanges();
 
