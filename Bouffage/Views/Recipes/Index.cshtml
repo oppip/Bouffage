@@ -51,6 +51,7 @@
                     <input type="hidden" name="recipe" value=@item.RecipeId />
 
                     <label id="arrow">
+                        @item.Upvotes
                         <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
                         <img src="~/Images/uvote.png" alt="placeholder">
                     </label>
@@ -58,8 +59,14 @@
                     <label id="arrow">
                         <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
                         <img src="~/Images/dvote.png" alt="placeholder">
+                        @item.Downvotes
                     </label>
                 </form>
+
+                if (UserRole == "Admin" || Useruserid == item.User.UserId)
+                {
+                    <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Recipes" asp-action="Delete" asp-route-id=@item.RecipeId>Delete</a>
+                }
             }
         </div>
 
@@ -97,7 +104,9 @@
                         @foreach (var user in Model.Users)
                             @if (comment.UserCommentedId == user.UserId)
                             {
-                                @Html.DisplayFor(modelItem => user.Username)
+                                <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@user.UserId">
+                                    @Html.DisplayFor(modelItem => user.Username)
+                                </a>
 
                                 string comment_upvote = "u&%&" + user.UserId + item.RecipeId;
                                 string comment_downvote = "d&%&" + user.UserId + item.RecipeId;
@@ -106,16 +115,22 @@
                                     <input type="hidden" name="comment" value=@comment.CommentId />
 
                                     <label id="arrow">
-                                        <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                                        @comment.Useful
+                                        <input type="radio" name="vote" id="upvote" value=@comment_upvote onclick="submit()">
                                         <img src="~/Images/uvote.png" alt="placeholder">
                                     </label>
 
                                     <label id="arrow">
-                                        <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                                        <input type="radio" name="vote" id="downvote" value=@comment_downvote onclick="submit()">
                                         <img src="~/Images/dvote.png" alt="placeholder">
+                                        @comment.Useless
                                     </label>
                                 </form>
 
+                                if (UserRole == "Admin" || Useruserid == item.User.UserId)
+                                {
+                                    <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Comments" asp-action="Delete" asp-route-id=@comment.CommentId>Delete</a>
+                                }
                             }
                         </div>
                         <div class="card-body">

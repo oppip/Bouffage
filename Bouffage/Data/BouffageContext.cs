@@ -43,15 +43,25 @@ namespace Bouffage.Data
             }
 
             { //Following junction table
-                builder.Entity<Following>()
+                /*builder.Entity<Following>()
                     .HasOne<User>(p => p.UserFollowing)
-                    .WithMany(p => p.FollowMe)
+                    .WithMany(p => p.IFollow)
                     .HasForeignKey(p => p.UserFollowingId).OnDelete(DeleteBehavior.NoAction);
 
                 builder.Entity<Following>()
                     .HasOne<User>(p => p.UserFollowee)
-                    .WithMany(p => p.IFollow)
-                    .HasForeignKey(p => p.UserFolloweeId).OnDelete(DeleteBehavior.NoAction);
+                    .WithMany(p => p.FollowMe)
+                    .HasForeignKey(p => p.UserFolloweeId).OnDelete(DeleteBehavior.NoAction);*/
+
+                builder.Entity<User>()
+                    .HasMany(p => p.IFollow)
+                    .WithOne(f => f.UserFollowee)
+                    .HasForeignKey(f => f.UserFolloweeId).OnDelete(DeleteBehavior.NoAction);
+
+                builder.Entity<User>()
+                    .HasMany(p => p.FollowMe)
+                    .WithOne(f => f.UserFollowing)
+                    .HasForeignKey(f => f.UserFollowingId).OnDelete(DeleteBehavior.NoAction);
             }
 
             { //Junction table for recipes in category

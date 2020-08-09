@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bouffage.Migrations
 {
     [DbContext(typeof(BouffageContext))]
-    [Migration("20200716113437_AddingIdentity")]
-    partial class AddingIdentity
+    [Migration("20200809183725_follow")]
+    partial class follow
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -286,6 +286,8 @@ namespace Bouffage.Migrations
 
                     b.HasKey("VoteCommentId");
 
+                    b.HasIndex("CommentGotVoted");
+
                     b.HasIndex("UserVotedThisComment");
 
                     b.ToTable("VoteComment");
@@ -309,6 +311,8 @@ namespace Bouffage.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("VoteRecipeId");
+
+                    b.HasIndex("RecipeGotVoted");
 
                     b.HasIndex("UserVotedThisRecipe");
 
@@ -580,7 +584,7 @@ namespace Bouffage.Migrations
                 {
                     b.HasOne("Bouffage.Models.Comment", "Comment")
                         .WithMany("UsersThatVotedComment")
-                        .HasForeignKey("UserVotedThisComment")
+                        .HasForeignKey("CommentGotVoted")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -595,7 +599,7 @@ namespace Bouffage.Migrations
                 {
                     b.HasOne("Bouffage.Models.Recipe", "Recipe")
                         .WithMany("UsersThatVotedRecipe")
-                        .HasForeignKey("UserVotedThisRecipe")
+                        .HasForeignKey("RecipeGotVoted")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 

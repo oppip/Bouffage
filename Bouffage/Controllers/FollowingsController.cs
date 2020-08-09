@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Bouffage.Data;
 using Bouffage.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CodeStyle;
 
 namespace Bouffage.Controllers
 {
@@ -166,7 +167,7 @@ namespace Bouffage.Controllers
 
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Follow( int userfollowed)
+        public async Task<IActionResult> Follow([FromForm] int user_id)
         {
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };
@@ -183,9 +184,16 @@ namespace Bouffage.Controllers
             Following follow = new Following
             {
                 UserFollowingId = Useruserid,
-                UserFolloweeId = userfollowed,
+                UserFolloweeId = user_id,
                 DateFollowed = DateTime.UtcNow
             };
+            var following = await _context.User.FirstOrDefaultAsync(m => m.UserId == Useruserid);
+            var followed = await _context.User.FirstOrDefaultAsync(m => m.UserId == user_id);
+            following.Following += 1;
+            followed.Followers += 1;
+
+            _context.Update(following);
+            _context.Update(followed);
             _context.Add(follow);
             await _context.SaveChangesAsync();
             return Redirect(Request.Headers["Referer"].ToString());
@@ -193,7 +201,7 @@ namespace Bouffage.Controllers
 
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> Unfollow( int userunfollowed)
+        public async Task<IActionResult> Unfollow([FromForm] int user_id)
         {
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };
@@ -207,10 +215,26 @@ namespace Bouffage.Controllers
             var Userusername = list[1];
             var UserRole = list[2];
 
-            var removefollowing = _context.Following.FirstOrDefaultAsync(m => m.UserFolloweeId == userunfollowed && m.UserFollowingId == Useruserid);
-            _context.Remove(removefollowing);
-            await _context.SaveChangesAsync();
-            return Redirect(Request.Headers["Referer"].ToString());
+            Following removefollowing = _context.Following.FirstOrDefault(m => m.UserFolloweeId == user_id && m.UserFollowingId == Useruserid);
+            if(removefollowing == null)
+            {
+                return Ok("nop");
+            }
+            else{
+
+                var unfollowing = await _context.User.FirstOrDefaultAsync(m => m.UserId == Useruserid);
+                var unfollowed = await _context.User.FirstOrDefaultAsync(m => m.UserId == user_id);
+                unfollowing.Following -= 1;
+                unfollowed.Followers -= 1;
+
+                _context.Update(unfollowing);
+                _context.Update(unfollowed);
+
+                _context.Following.Remove(removefollowing);
+                await _context.SaveChangesAsync();
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            
         }
     }
 }

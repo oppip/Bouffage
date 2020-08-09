@@ -24,6 +24,9 @@
                 if (errors != null)
                 {
                     errorlist = errors.Split("&%&");
+                    <script>
+                        document.getElementById('id01').style.display = 'block';
+                    </script>
                 }
                 var email = errorlist[1];
                 var error = errorlist[0];
@@ -45,7 +48,7 @@
                     <br>
                     @if (error != null)
                     {
-                        <h6>@error</h6>
+                        <h6 style="color: red">@error</h6>
                     }
                     <label for="Password"><b>Лозинка</b></label>
                     <input type="password" placeholder="Enter Password" name="Password" required>
@@ -142,7 +145,7 @@
                     }
 
                 }
-            </div>
+                </div>
         </nav>
     </header>
     <div style="margin-left: 2%; margin-right: 2%; padding: unset; border: none; margin-top: 6%">

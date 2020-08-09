@@ -166,7 +166,7 @@ namespace Bouffage.Controllers
             IQueryable<Comment> comments = _context.Comment.AsQueryable();
 
             recipes = recipes.Where(p => p.UserPostedRecipeId == user.UserId);
-            comments = comments.Where(p => p.UserCommentedId == user.UserId);
+            comments = comments.Where(p => p.UserCommentedId == user.UserId).Include(p => p.Recipe);
 
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };
@@ -217,10 +217,9 @@ namespace Bouffage.Controllers
             var HashedPassword = BC.HashPassword(Password);
             var user = _users.SingleOrDefault(x => x.Email == Email && BC.Verify(Password, x.Password));
             string key = "MyCookie";
-            string value = user.UserId.ToString() + "&%&" + user.Username + "&%&" + user.Role;
             CookieOptions cookieOptions = new CookieOptions();
             //cookieOptions.Expires = DateTime.Now.AddMinutes(2);
-            Response.Cookies.Append(key, value, cookieOptions);
+
             if (user == null)
             {
                 var error = "Неточна е-пошта или лозинка&%&" + Email ;
@@ -231,6 +230,9 @@ namespace Bouffage.Controllers
             }
             else
             {
+                string value = user.UserId.ToString() + "&%&" + user.Username + "&%&" + user.Role;
+                Response.Cookies.Append(key, value, cookieOptions);
+
                 var claims = new List<Claim>
                {
                    new Claim(ClaimTypes.Name, Email)

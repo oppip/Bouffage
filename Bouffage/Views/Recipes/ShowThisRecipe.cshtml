@@ -20,7 +20,7 @@
             <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@Model.Recipe.User.UserId">
                 @Html.DisplayFor(modelItem => Model.Recipe.User.Username)
             </a>
-            @{ 
+            @{
                 var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
                 string[] list = { "", "", "" };
                 if (cookie != null)
@@ -41,6 +41,7 @@
                     <input type="hidden" name="recipe" value=@Model.Recipe.RecipeId />
 
                     <label id="arrow">
+                        @Model.Recipe.Upvotes
                         <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
                         <img src="~/Images/uvote.png" alt="placeholder">
                     </label>
@@ -48,9 +49,15 @@
                     <label id="arrow">
                         <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
                         <img src="~/Images/dvote.png" alt="placeholder">
+                        @Model.Recipe.Downvotes
                     </label>
                 </form>
-             }
+
+                if (UserRole == "Admin" || Useruserid == Model.Recipe.User.UserId)
+                {
+                    <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Recipes" asp-action="Delete" asp-route-id=@Model.Recipe.RecipeId>Delete</a>
+                }
+            }
         </div>
 
         <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
@@ -81,8 +88,10 @@
             <div class="card text-white bg-info mb-3" style="width: auto;">
                 <div class="card-header">
 
-                    @Html.DisplayFor(modelItem => comment.User.Username)
-                    @{                          
+                    <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@comment.User.UserId">
+                        @Html.DisplayFor(modelItem => comment.User.Username)
+                    </a>
+                    @{
                         string comment_upvote = "u&%&" + comment.User.UserId;
                         string comment_downvote = "d&%&" + comment.User.UserId;
 
@@ -90,15 +99,22 @@
                             <input type="hidden" name="comment" value=@comment.CommentId />
 
                             <label id="arrow">
-                                <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                                @comment.Useful
+                                <input type="radio" name="vote" id="upvote" value=@comment_upvote onclick="submit()">
                                 <img src="~/Images/uvote.png" alt="placeholder">
                             </label>
 
                             <label id="arrow">
-                                <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                                <input type="radio" name="vote" id="downvote" value=@comment_downvote onclick="submit()">
                                 <img src="~/Images/dvote.png" alt="placeholder">
+                                @comment.Useless
                             </label>
                         </form>
+
+                        if (UserRole == "Admin" || Useruserid == comment.User.UserId)
+                        {
+                            <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Comments" asp-action="Delete" asp-route-id=@comment.CommentId>Delete</a>
+                        }
                     }
                 </div>
 
