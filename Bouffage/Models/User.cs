@@ -36,6 +36,8 @@ namespace Bouffage.Models
 
         public int Followers { get; set; }      //Which users follow this account	
 
+        public string Picture { get; set; } //profile picture
+
         public bool VerifiedEmail { get; set; }
 
         public ICollection<Following> IFollow { get; set; }

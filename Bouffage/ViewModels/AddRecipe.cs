@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Bouffage.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bouffage.ViewModels
@@ -37,6 +38,9 @@ namespace Bouffage.ViewModels
         public int Servings { get; set; }
         [DisplayName("List all the special equipment used")]
         public string SpecialEquipment { get; set; }
+        [Required(ErrorMessage = "Please upload images of the case!")]
+        [Display(Name = "Слика од јадењето")]
+        public IFormFile UploadPicture { get; set; }
         public IList<int> SelectedCategories { get; set; } 
         public SelectList Categories { get; set; }
         public string[] Ingredients { get; set; }

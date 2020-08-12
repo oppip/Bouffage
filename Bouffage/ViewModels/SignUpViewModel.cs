@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Bouffage.ViewModels
 {
@@ -40,6 +41,10 @@ namespace Bouffage.ViewModels
         public int Followed { get; set; }
 
         public bool VerifiedEmail { get; set; }
+
+        [Required(ErrorMessage = "Please upload images of the case!")]
+        [Display(Name = "Лична слика")]
+        public IFormFile UploadPicture { get; set; }
 
         public SignUpViewModel()
         {

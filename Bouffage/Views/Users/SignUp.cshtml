@@ -12,7 +12,7 @@
 <div id="id01" class="modal" style="display: block; margin-top: 3%">
 
     <!-- Modal Content -->
-    <form class="modal-content animate" style="width: 60%" asp-controller="Users" asp-action="SignUp" method="POST">
+    <form class="modal-content animate" style="width: 60%" asp-controller="Users" asp-action="SignUp" method="POST" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="column">
             <div class="container left">
@@ -41,8 +41,18 @@
             </div>
             <div class="container left">
                 <h4>За да може да ги користите сите алаткви, ве молиме креирајте профил.</h4>
-                <label for="profile_picture"><b>Поставете слика: </b></label>
-                <!-- <input type="file" name="profile_picture" id="profile_picture"> -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="UploadPicture" class="control-label"></label>
+                            <div class="custom-file">
+                                <input asp-for="UploadPicture" class="custom-file-input" id="customFile">
+                                <label class="custom-file-label" style="width: 260px" for="customFile">Поставете слика:</label>
+                            </div>
+                            <span asp-validation-for="UploadPicture" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
 
             </div>
             <footer>
@@ -72,5 +82,10 @@
                 modal.style.display = "none";
             }
         }
+
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
     </script>
 }

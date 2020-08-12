@@ -106,6 +106,8 @@ namespace Bouffage.Models
 
         public DateTime? PostingDate { get; set; }
 
+        public string Picture { get; set; } //picture of the food
+
         [StringLength(100)]
         public string SpecialEquipment { get; set; }      //Is any special equipment needed for making this recipe
 

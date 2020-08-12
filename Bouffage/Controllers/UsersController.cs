@@ -15,16 +15,20 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Bouffage.Controllers
 {
     public class UsersController : Controller
     {
         private readonly BouffageContext _context;
+        private readonly IHostingEnvironment webHostEnvironment;
 
-        public UsersController(BouffageContext context)
+        public UsersController(BouffageContext context, IHostingEnvironment hostEnvironment)
         {
             _context = context;
+            webHostEnvironment = hostEnvironment;
         }
 
         // GET: Users
@@ -271,6 +275,7 @@ namespace Bouffage.Controllers
         {
             if (ModelState.IsValid)
             {
+                string url = UploadedFile(user);
                 var flag = false;
                 var uniqueness = _context.User.Any(x => x.Email == user.Email);
                 if (user.Password != user.ConfirmedPassword)
@@ -300,7 +305,8 @@ namespace Bouffage.Controllers
                         Karma = 0,
                         DateCreated = DateTime.UtcNow,
                         Username = user.Username,
-                        Role = "User"
+                        Role = "User",
+                        Picture = "/Profile_pictures/"+ url
                     };
                     _context.Add(newuser);
                     await _context.SaveChangesAsync();
@@ -395,6 +401,23 @@ namespace Bouffage.Controllers
             _context.User.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        private string UploadedFile(SignUpViewModel model)
+        {
+            string uniqueFileName = null;
+
+            if (model.UploadPicture != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Profile_pictures");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.UploadPicture.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.UploadPicture.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
         }
 
     }

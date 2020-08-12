@@ -7,6 +7,9 @@
 <div class="card bg-warning" style="width: 100%; margin-left: 7px;">
     <div class="card-body">
         <div class="inline">
+            <img src="@Model.User.Picture" alt="Profile picture" class="profilepic" />
+        </div>
+        <div class="inline">
             <h4 class="card-title">@Html.DisplayFor(modelItem => Model.User.Username)</h4>
             <h6 class="card-subtitle mb-2 text-muted">@Html.DisplayFor(modelItem => Model.User.Email)</h6>
         </div>
@@ -15,49 +18,49 @@
                 <p class="card-text inline"> Following: @Html.DisplayFor(modelItem => Model.User.Following)</p>
                 <p class="card-text inline"> Followers: @Html.DisplayFor(modelItem => Model.User.Followers)</p>
             </div>
-                @{
-                    var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
-                    string[] list = { "", "", "" };
-                    if (cookie != null)
-                    {
-                        list = cookie.Split("&%&");
-                    }
+            @{
+                var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+                string[] list = { "", "", "" };
+                if (cookie != null)
+                {
+                    list = cookie.Split("&%&");
+                }
 
-                    int Useruserid = 0;
-                    Int32.TryParse(list[0], out Useruserid);
-                    var Userusername = list[1];
-                    var UserRole = list[2];
+                int Useruserid = 0;
+                Int32.TryParse(list[0], out Useruserid);
+                var Userusername = list[1];
+                var UserRole = list[2];
 
-                    @if (ViewBag.followingeachother == true)
+                @if (ViewBag.followingeachother == true)
+                {
+                    <form style="border: unset" asp-action="Unfollow" asp-controller="Followings" method="POST">
+                        <input type="hidden" name="user_id" value=@Model.User.UserId>
+                        <button type="submit" class="follow" style="background-color: orangered">Unfollow</button>
+                    </form>
+                }
+                else
+                {
+                    if (Useruserid == Model.User.UserId)
                     {
-                        <form style="border: unset" asp-action="Unfollow" asp-controller="Followings" method="POST">
-                            <input type="hidden" name="user_id" value=@Model.User.UserId>
-                            <button type="submit" class="follow" style="background-color: orangered">Unfollow</button>
-                        </form>
+                        <button class="follow" style="background-color: #4287f5" onclick="myfunc()">Surprise!</button>
+                        <script>
+                            function myfunc() {
+                                if (confirm("Are you ready?")) {
+                                    window.open("https://youtu.be/dQw4w9WgXcQ");
+                                }
+                            }
+                        </script>
                     }
                     else
                     {
-                        if (Useruserid == Model.User.UserId)
-                        {
-                            <button class="follow" style="background-color: #4287f5" onclick="myfunc()">Surprise!</button>
-                            <script>
-                                function myfunc() {
-                                    if (confirm("Are you ready?")) {
-                                        window.open("https://youtu.be/dQw4w9WgXcQ");
-                                    }
-                                }
-                            </script>
-                        }
-                        else
-                        {
-                            <form style="border: unset" asp-action="Follow" asp-controller="Followings" method="POST">
-                                <input type="hidden" name="user_id" value=@Model.User.UserId>
-                                <button type="submit" class="follow">Follow</button>
-                            </form>
-                        }
+                        <form style="border: unset" asp-action="Follow" asp-controller="Followings" method="POST">
+                            <input type="hidden" name="user_id" value=@Model.User.UserId>
+                            <button type="submit" class="follow">Follow</button>
+                        </form>
                     }
-
                 }
+
+            }
         </div>
         <div class="inline" style="width: 30%">
             <p style="text-align:center">
@@ -94,7 +97,7 @@
         </div>
 
         <div class="inline" style="float: right">
-           @{ 
+            @{
                 if (UserRole == "Admin")
                 {
                     if (Model.User.Role == "Admin")

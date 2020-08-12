@@ -60,35 +60,35 @@
             }
         </div>
 
-        <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+        <img style="width: 100%; height: auto; display: block;" src="@Model.Recipe.Picture" alt="Card image">
 
         <div class="card-body">
-            <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
+            <p class="card-text">@Html.DisplayFor(modelItem => Model.Recipe.Essay)</p>
             <br />
 
             <p>
-                Потребно време за подготовка: @Html.DisplayFor(modelItem => item.PrepTime)
+                Потребно време за подготовка: @Html.DisplayFor(modelItem => Model.Recipe.PrepTime)
             </p>
             <br />
 
             <p>
-                Потребно време за готвење: @Html.DisplayFor(modelItem => item.CookTime)
+                Потребно време за готвење: @Html.DisplayFor(modelItem => Model.Recipe.CookTime)
             </p>
             <br />
 
             <p>
-                @Html.DisplayFor(modelItem => item.Complexity)
+                @Html.DisplayFor(modelItem => Model.Recipe.Complexity)
             </p>
             <br />
 
             <p>
-                @Html.DisplayFor(modelItem => item.Preparation)
+                @Html.DisplayFor(modelItem => Model.Recipe.Preparation)
             </p>
             <br />
-            @if (item.SpecialEquipment != "")
+            @if (Model.Recipe.SpecialEquipment != "")
             {
                 <p>
-                    Се користи: @Html.DisplayFor(modelItem => item.SpecialEquipment)
+                    Се користи: @Html.DisplayFor(modelItem => Model.Recipe.SpecialEquipment)
                 </p>
             }
         </div>

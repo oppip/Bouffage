@@ -10,16 +10,21 @@ using Bouffage.Models;
 using Bouffage.ViewModels;
 using System.Collections.Immutable;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace Bouffage.Controllers
 {
     public class RecipesController : Controller
     {
         private readonly BouffageContext _context;
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment webHostEnvironment;
 
-        public RecipesController(BouffageContext context)
+        public RecipesController(BouffageContext context, Microsoft.AspNetCore.Hosting.IHostingEnvironment hostEnvironment)
         {
             _context = context;
+            webHostEnvironment = hostEnvironment;
         }
 
         // GET: Recipes
@@ -86,6 +91,7 @@ namespace Bouffage.Controllers
         {
             if (ModelState.IsValid)
             {
+                var url = UploadedFile(nrecipe);
                 var cookie = Request.Cookies["MyCookie"];
                 string[] list = { "", "", "" };
                 if (cookie != null)
@@ -97,7 +103,7 @@ namespace Bouffage.Controllers
                 Int32.TryParse(list[0], out Useruserid);
                 var Userusername = list[1];
                 var UserRole = list[2];
-                
+
                 var recipe = new Recipe
                 {
                     Title = nrecipe.Title,
@@ -112,7 +118,8 @@ namespace Bouffage.Controllers
                     Downvotes = 0,
                     PostingDate = DateTime.UtcNow,
                     SpecialEquipment = nrecipe.SpecialEquipment,
-                    UserPostedRecipeId = Useruserid
+                    UserPostedRecipeId = Useruserid,
+                    Picture = "/Recipe Images/" + url
                 };
                 _context.Add(recipe);
                 await _context.SaveChangesAsync();
@@ -282,6 +289,23 @@ namespace Bouffage.Controllers
             };
 
             return View(recipesandcomments);
+        }
+
+        private string UploadedFile(AddRecipe model)
+        {
+            string uniqueFileName = null;
+
+            if (model.UploadPicture != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Recipe Images");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(model.UploadPicture.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.UploadPicture.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
         }
 
     }

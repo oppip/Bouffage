@@ -199,3 +199,10 @@ label {
     display: unset;
     margin:unset;
 }
+
+.profilepic {
+    border-radius: 50%;
+    max-height: 20%;
+    max-width: 20%;
+    margin-top: 10px;
+}

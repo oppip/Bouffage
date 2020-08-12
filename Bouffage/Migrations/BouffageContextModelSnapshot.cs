@@ -165,6 +165,9 @@ namespace Bouffage.Migrations
                         .HasColumnType("nvarchar(700)")
                         .HasMaxLength(700);
 
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("PostingDate")
                         .HasColumnType("datetime2");
 
@@ -248,6 +251,9 @@ namespace Bouffage.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(60)")
                         .HasMaxLength(60);
+
+                    b.Property<string>("Picture")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(20)")
