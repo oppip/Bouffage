@@ -15,162 +15,252 @@
 
 @foreach (var item in Model.Recipes)
 {
-    <div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
-        <span id="@item.RecipeId"></span>
+<div class="card border-secondary mb-3" style="width: 60%; margin: auto ">
+    <span id="@item.RecipeId"></span>
 
-        <div class="card-header">
-            <h4 style="margin: 0px;">
-                <p style="margin: 0px;">
-                    @Html.DisplayFor(modelItem => item.Title)
-                </p>
-            </h4>
-        </div>
-
-        <div class="card-body">
-            <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
-                @Html.DisplayFor(modelItem => item.User.Username)
-            </a>
-            @{
-                var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
-                string[] list = { "", "", "" };
-                if (cookie != null)
-                {
-                    list = cookie.Split("&%&");
-                }
-
-                int Useruserid = 0;
-                Int32.TryParse(list[0], out Useruserid);
-                var Userusername = list[1];
-                var UserRole = list[2];
-
-                var time = DateTime.Now;
-                string upvote = "u&%&" + item.User.UserId + "&%&" + item.RecipeId;
-                string downvote = "d&%&" + item.User.UserId + "&%&" + item.RecipeId;
-
-                <form class="voting" asp-action="VoteRecipe" asp-controller="VoteRecipes" method="POST">
-                    <input type="hidden" name="recipe" value=@item.RecipeId />
-
-                    <label id="arrow">
-                        @item.Upvotes
-                        <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
-                        <img src="~/Images/uvote.png" alt="placeholder">
-                    </label>
-
-                    <label id="arrow">
-                        <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
-                        <img src="~/Images/dvote.png" alt="placeholder">
-                        @item.Downvotes
-                    </label>
-                </form>
-
-                if (UserRole == "Admin" || Useruserid == item.User.UserId)
-                {
-                    <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Recipes" asp-action="Delete" asp-route-id=@item.RecipeId>Delete</a>
-                }
-            }
-        </div>
-
-        <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
-
-        <div class="card-body">
-            <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
-            <br />
-
-            <p>
-                @Html.DisplayFor(modelItem => item.Preparation)
+    <div class="card-header">
+        <h4 style="margin: 0px;">
+            <p style="margin: 0px;">
+                @Html.DisplayFor(modelItem => item.Title)
             </p>
-        </div>
+        </h4>
+    </div>
 
-        <ul class="list-group list-group-flush">
-            @foreach (var ingredient in Model.Ingredients)
+    <div class="card-body">
+        <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@item.User.UserId">
+            @Html.DisplayFor(modelItem => item.User.Username)
+        </a>
+        @{
+            var cookie = HttpContextAccessor.HttpContext.Request.Cookies["MyCookie"];
+            string[] list = { "", "", "" };
+            if (cookie != null)
             {
-                @if (ingredient.RecipeId == item.RecipeId)
-                {
-                    <li class="list-group-item">
-                        @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
-                    </li>
-                }
+                list = cookie.Split("&%&");
             }
-        </ul>
-        <br />
 
+            int Useruserid = 0;
+            Int32.TryParse(list[0], out Useruserid);
+            var Userusername = list[1];
+            var UserRole = list[2];
 
-        @foreach (var comment in Model.Comments)
-        {
-            @if (comment.CommentOnRecipeId == item.RecipeId)
+            var time = DateTime.Now;
+            string upvote = "u&%&" + item.User.UserId + "&%&" + item.RecipeId;
+            string downvote = "d&%&" + item.User.UserId + "&%&" + item.RecipeId;
+
+            <form class="voting" asp-action="VoteRecipe" asp-controller="VoteRecipes" method="POST">
+                <input type="hidden" name="recipe" value=@item.RecipeId />
+
+                <label id="arrow">
+                    @item.Upvotes
+                    <input type="radio" name="vote" id="upvote" value=@upvote onclick="submit()">
+                    <img src="~/Images/uvote.png" alt="placeholder">
+                </label>
+
+                <label id="arrow">
+                    <input type="radio" name="vote" id="downvote" value=@downvote onclick="submit()">
+                    <img src="~/Images/dvote.png" alt="placeholder">
+                    @item.Downvotes
+                </label>
+            </form>
+
+            if (UserRole == "Admin" || Useruserid == item.User.UserId)
             {
-                <div class="card text-white bg-info mb-3" style="width: auto;">
-                    <div class="card-header">
-                        @foreach (var user in Model.Users)
-                            @if (comment.UserCommentedId == user.UserId)
-                            {
-                                <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@user.UserId">
-                                    @Html.DisplayFor(modelItem => user.Username)
-                                </a>
-
-                                string comment_upvote = "u&%&" + user.UserId + item.RecipeId;
-                                string comment_downvote = "d&%&" + user.UserId + item.RecipeId;
-
-                                <form class="voting" asp-action="VoteComment" asp-controller="VoteComments" method="POST">
-                                    <input type="hidden" name="comment" value=@comment.CommentId />
-
-                                    <label id="arrow">
-                                        @comment.Useful
-                                        <input type="radio" name="vote" id="upvote" value=@comment_upvote onclick="submit()">
-                                        <img src="~/Images/uvote.png" alt="placeholder">
-                                    </label>
-
-                                    <label id="arrow">
-                                        <input type="radio" name="vote" id="downvote" value=@comment_downvote onclick="submit()">
-                                        <img src="~/Images/dvote.png" alt="placeholder">
-                                        @comment.Useless
-                                    </label>
-                                </form>
-
-                                if (UserRole == "Admin" || Useruserid == item.User.UserId)
-                                {
-                                    <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Comments" asp-action="Delete" asp-route-id=@comment.CommentId>Delete</a>
-                                }
-                            }
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-text">
-                                @Html.DisplayFor(modelItem => comment.Critique)
-                            </h5>
-                        </div>
-                        <div class="card-footer">
-                            @Html.DisplayFor(modelItem => comment.CommentPosted)
-                        </div>
-                    </div>
+                <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Recipes" asp-action="DeleteConfirmed" asp-route-id=@item.RecipeId>Delete</a>
             }
         }
-        @{             
-            <div class="card text-white bg-info mb-3" style="width: auto;">
-                <div class="card-body">
-                    <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">
-                        <input type="hidden" name="recipe_commented" value=@item.RecipeId>
-                        <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a comment...">
+    </div>
 
-                        <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
-                            <button type="submit" name="type" class="leavecomment" value=@Comment.TypeOfC.Comment >Comment!</button>
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="leavecomment dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
-                                <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Question>Question</button>
-                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Tip>Tip</button>
-                                    <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Review>Review</button>
-                                </div>
+    <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+
+    <div class="card-body">
+        <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>
+        <br />
+
+        <p>
+            Потребно време за подготовка: @Html.DisplayFor(modelItem => item.PrepTime)
+        </p>
+        <br />
+
+        <p>
+            Потребно време за готвење: @Html.DisplayFor(modelItem => item.CookTime)
+        </p>
+        <br />
+
+        <p>
+            @Html.DisplayFor(modelItem => item.Complexity)
+        </p>
+        <br />
+
+        <p>
+            @Html.DisplayFor(modelItem => item.Preparation)
+        </p>
+        <br />
+        @if (item.SpecialEquipment != "")
+        {
+            <p>
+                Се користи: @Html.DisplayFor(modelItem => item.SpecialEquipment)
+            </p>
+        }
+    </div>
+
+    <ul class="list-group list-group-flush">
+        @foreach (var ingredient in item.Ingredients)
+        {
+            <li class="list-group-item">
+                @Html.DisplayFor(modelItem => ingredient.IngredientUsed)
+            </li>
+        }
+    </ul>
+    <br />
+
+
+    @foreach (var comment in item.CommentsOnThisRecipe)
+    {
+        if (comment.ReplyCommentId == null)
+        {
+            <div class="card text-white bg-info mb-3" style="width: auto;">
+                <div class="card-header">
+                    @{
+                        var user = comment.User;
+                        if (user == null)
+                        {
+                            <div class="username inline">
+                                [deleted]
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@user.UserId">
+                                @Html.DisplayFor(modelItem => user.Username)
+                            </a>
+                            string comment_upvote = "u&%&" + user.UserId + item.RecipeId;
+                            string comment_downvote = "d&%&" + user.UserId + item.RecipeId;
+
+                            <form class="voting" asp-action="VoteComment" asp-controller="VoteComments" method="POST">
+                                <input type="hidden" name="comment" value=@comment.CommentId />
+
+                                <label id="arrow">
+                                    @comment.Useful
+                                    <input type="radio" name="vote" id="upvote" value=@comment_upvote onclick="submit()">
+                                    <img src="~/Images/uvote.png" alt="placeholder">
+                                </label>
+
+                                <label id="arrow">
+                                    <input type="radio" name="vote" id="downvote" value=@comment_downvote onclick="submit()">
+                                    <img src="~/Images/dvote.png" alt="placeholder">
+                                    @comment.Useless
+                                </label>
+                            </form>
+
+                            if (UserRole == "Admin" || Useruserid == user.UserId)
+                            {
+                                <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Comments" asp-action="DeleteConfirmed" asp-route-id=@comment.CommentId>Delete</a>
+                            }
+                        }
+                    }
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-text">
+                        @Html.DisplayFor(modelItem => comment.Critique)
+                    </h5>
+                    @foreach (var reply in comment.Replies)
+                    {
+                        <div class="card text-white bg-info mb-3" style="width: auto;  background-color: #17b5b8 !important">
+                            <div class="card-header">
+                                @{
+                                    var replyuser = reply.User;
+                                    <a class="username inline" asp-controller="Users" asp-action="GetThisGuysProfile" asp-route-id="@replyuser.UserId">
+                                        @Html.DisplayFor(modelItem => replyuser.Username)
+                                    </a>
+
+                                    string reply_upvote = "u&%&" + reply.User.UserId + item.RecipeId;
+                                    string reply_downvote = "d&%&" + reply.User.UserId + item.RecipeId;
+
+                                    <form class="voting" asp-action="VoteComment" asp-controller="VoteComments" method="POST">
+                                        <input type="hidden" name="comment" value=@reply.CommentId />
+
+                                        <label id="arrow">
+                                            @reply.Useful
+                                            <input type="radio" name="vote" id="upvote" value=@reply_upvote onclick="submit()">
+                                            <img src="~/Images/uvote.png" alt="placeholder">
+                                        </label>
+
+                                        <label id="arrow">
+                                            <input type="radio" name="vote" id="downvote" value=@reply_downvote onclick="submit()">
+                                            <img src="~/Images/dvote.png" alt="placeholder">
+                                            @reply.Useless
+                                        </label>
+                                    </form>
+
+                                    if (UserRole == "Admin" || Useruserid == replyuser.UserId)
+                                    {
+                                        <a class="cancelbtn" style="float: right" asp-area="" asp-controller="Comments" asp-action="DeleteConfirmed" asp-route-id="@reply.CommentId">Delete</a>
+                                    }
+                                }
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-text">
+                                    @Html.DisplayFor(modelItem => reply.Critique)
+                                </h5>
+                            </div>
+                            <div class="card-footer">
+                                @Html.DisplayFor(modelItem => reply.CommentPosted)
                             </div>
                         </div>
-                    </form>
+                    }
+
+                    @{
+                        <div class="card text-white bg-info mb-3" style="width: auto; background-color: #17b5b8 !important">
+                            <div class="card-body">
+                                <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">
+                                    <input type="hidden" name="recipe_commented" value=@item.RecipeId>
+                                    <input type="hidden" name="replyid" value=@comment.CommentId>
+                                    <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a reply..." required>
+
+                                    <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
+                                        <button type="submit" name="type" class="leavecomment" value=@Comment.TypeOfC.Comment>Reply</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div class="card-footer">
+                    @Html.DisplayFor(modelItem => comment.CommentPosted)
                 </div>
             </div>
-          }
+        }
+    }
+    @{
+        <div class="card text-white bg-info mb-3" style="width: auto;">
+            <div class="card-body">
+                <form asp-action="LeaveAComment" asp-controller="Comments" style="border: none" method="POST">
+                    <input type="hidden" name="recipe_commented" value=@item.RecipeId>
+                    <input class="comment" type="text" style="width: 45%" name="critique" placeholder="Leave a comment...">
 
-        <div class="card-footer text-muted">
-            @Html.DisplayFor(modelItem => item.PostingDate)
+                    <div class="btn-group" style="float: right" role="group" aria-label="Button group with nested dropdown">
+                        <button type="submit" name="type" class="leavecomment" value=@Comment.TypeOfC.Comment>Comment!</button>
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button" class="leavecomment dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Question>Question</button>
+                                <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Tip>Tip</button>
+                                <button type="submit" name="type" class="dropdown-item" value=@Comment.TypeOfC.Review>Review</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
+    }
 
+    <div class="card-footer text-muted">
+        @Html.DisplayFor(modelItem => item.PostingDate)
     </div>
+
+</div>
 
 }

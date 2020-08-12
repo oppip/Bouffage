@@ -143,14 +143,26 @@ namespace Bouffage.Controllers
         }
 
         // POST: Comments/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var comment = await _context.Comment.FindAsync(id);
-            _context.Comment.Remove(comment);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            IQueryable<Comment> commentt = _context.Comment.AsQueryable();
+            commentt = commentt.Where(m => m.CommentId == id).Include(m => m.Replies);
+            var comment = commentt.FirstOrDefault(m => m.CommentId == id);
+            if (comment.Replies == null)
+            {
+                _context.Comment.Remove(comment);
+                await _context.SaveChangesAsync();
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            else
+            {
+                comment.UserCommentedId = null;
+                _context.Comment.Update(comment);
+                await _context.SaveChangesAsync();
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            
         }
 
         private bool CommentExists(int id)
@@ -161,7 +173,7 @@ namespace Bouffage.Controllers
 
         [ValidateAntiForgeryToken]
         [Authorize]
-        public async Task<IActionResult> LeaveAComment([FromForm] int recipe_commented, [FromForm] string critique, int? replyid, [FromForm] Comment.TypeOfC type)
+        public async Task<IActionResult> LeaveAComment([FromForm] int recipe_commented, [FromForm] string critique, [FromForm] int? replyid, [FromForm] Comment.TypeOfC type)
         {
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };

@@ -161,23 +161,17 @@ namespace Bouffage.Models
                     ) ;
                 context.SaveChanges();
 
-                context.Category.AddRange(
+                var i = 0;
+                foreach (var c in Enum.GetNames(typeof(Category.Tags)))
+                {
+                    context.Category.AddRange(
                     new Category
                     {
-                        /*CategoryId = 1*/
-                        Tag = Category.Tags.Vegan
-                    },
-                    new Category
-                    {
-                        /*CategoryId = 2*/
-                        Tag = Category.Tags.Vegetarian
-                    },
-                    new Category
-                    {
-                        /*CategoryId = 3*/
-                        Tag = Category.Tags.Vegetarian
+                        Tag = (Category.Tags)i
                     }
                     );
+                    i++;
+                }
                 context.SaveChanges();
 
 
@@ -203,7 +197,7 @@ namespace Bouffage.Models
                     }
                     );
                 context.SaveChanges();
-
+                
             }
         }
     }

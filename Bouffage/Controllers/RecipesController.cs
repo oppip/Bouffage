@@ -9,6 +9,7 @@ using Bouffage.Data;
 using Bouffage.Models;
 using Bouffage.ViewModels;
 using System.Collections.Immutable;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bouffage.Controllers
 {
@@ -24,11 +25,14 @@ namespace Bouffage.Controllers
         // GET: Recipes
         public async Task<IActionResult> Index()
         {
-            IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
+            //IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
             IQueryable<Comment> comments = _context.Comment.AsQueryable();
             IQueryable<User> users = _context.User.AsQueryable();
             IQueryable<Ingredient> ingredients = _context.Ingredient.AsQueryable();
 
+            IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
+            recipes = recipes.Include(m => m.User).Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(s => s.User);
+            recipes = recipes.Include(m => m.CommentsOnThisRecipe).ThenInclude(m => m.Replies);
             var recipesandcomments = new RecipeAndCommentsViewModel
             {
                 Recipes = await recipes.ToListAsync(),
@@ -59,17 +63,17 @@ namespace Bouffage.Controllers
         }
 
         // GET: Recipes/Create
-        public IActionResult Create()
+        [Authorize]
+        public async Task<IActionResult> Create()
         {
-            var recipe = new Recipe();
-            AddRecipe viewmodel = new AddRecipe
+            IQueryable<Category> categories = _context.Category;
+            IQueryable<Recipe> recipe = _context.Recipe;
+            recipe = recipe.Include(m => m.Cuisine).Include(m => m.Complexity);
+            var newrecipe = new AddRecipe
             {
-                Recipe = recipe,
-                CategoryList = new MultiSelectList(_context.Category.OrderBy(s => s.CategoryId), "Tags"),
-                SelectedCategories = recipe.Categories.Select(sa => sa.CategoryId)
+                Categories = new SelectList(await categories.OrderBy(s => s.Tag).ToListAsync(), "CategoryId", "Tag")
             };
-
-            return View(viewmodel);
+            return View(newrecipe);
         }
 
         // POST: Recipes/Create
@@ -77,18 +81,68 @@ namespace Bouffage.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AddRecipe recipe)
+        [Authorize]
+        public async Task<IActionResult> Create(AddRecipe nrecipe, [FromForm] string[] ingredient)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(recipe.Recipe);
+                var cookie = Request.Cookies["MyCookie"];
+                string[] list = { "", "", "" };
+                if (cookie != null)
+                {
+                    list = cookie.Split("&%&");
+                }
 
+                int Useruserid = 0;
+                Int32.TryParse(list[0], out Useruserid);
+                var Userusername = list[1];
+                var UserRole = list[2];
+                
+                var recipe = new Recipe
+                {
+                    Title = nrecipe.Title,
+                    Cuisine = nrecipe.CuisineFood,
+                    Essay = nrecipe.Essay,
+                    Preparation = nrecipe.Preparation,
+                    PrepTime = nrecipe.PrepTime,
+                    CookTime = nrecipe.CookTime,
+                    Servings = nrecipe.Servings,
+                    Complexity = nrecipe.Complex,
+                    Upvotes = 0,
+                    Downvotes = 0,
+                    PostingDate = DateTime.UtcNow,
+                    SpecialEquipment = nrecipe.SpecialEquipment,
+                    UserPostedRecipeId = Useruserid
+                };
+                _context.Add(recipe);
+                await _context.SaveChangesAsync();
+                foreach (int cid in nrecipe.SelectedCategories)
+                {
+                    RecipeInCategory cat = new RecipeInCategory
+                    {
+                        RecipeId = recipe.RecipeId,
+                        CategoryId = cid
+                    };
+                    _context.Add(cat);
+                    await _context.SaveChangesAsync();
+                }
+
+                foreach(var ingre in ingredient)
+                {
+                    Ingredient n = new Ingredient
+                    {
+                        IngredientUsed = ingre,
+                        RecipeId = recipe.RecipeId
+                    };
+                    _context.Add(n);
+                    await _context.SaveChangesAsync();
+                }
 
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ShowThisRecipe", "Recipes", new { id = recipe.RecipeId });
             }
-            return View(recipe);
+            return View(nrecipe);
         }
 
         // GET: Recipes/Edit/5
@@ -161,14 +215,44 @@ namespace Bouffage.Controllers
         }
 
         // POST: Recipes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var recipe = await _context.Recipe.FindAsync(id);
-            _context.Recipe.Remove(recipe);
+            IQueryable<Recipe> recipe = _context.Recipe.AsQueryable();
+            recipe = recipe.Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(m => m.Replies);
+            var theone = recipe.FirstOrDefault(m => m.RecipeId == id);
+            IQueryable<Comment> com = _context.Comment.AsQueryable();
+            com = com.Where(m => m.CommentOnRecipeId == id);
+            int rep = com.Count() - theone.CommentsOnThisRecipe.Count();
+            int comments = theone.CommentsOnThisRecipe.Count();
+            int replies= rep;
+            int ingredients = theone.Ingredients.Count();
+            
+            while(replies>0)
+            {
+                var deletereply = _context.Comment.FirstOrDefault(m => m.CommentOnRecipeId == id);
+                _context.Comment.Remove(deletereply);
+                replies--;
+                await _context.SaveChangesAsync();
+            }
+            while (comments > 0)
+            {
+                var deletecomments = _context.Comment.FirstOrDefault(m => m.CommentOnRecipeId == id);
+                _context.Comment.Remove(deletecomments);
+                comments--;
+                await _context.SaveChangesAsync();
+            }
+            while (ingredients > 0)
+            {
+                var deleteingredient = _context.Ingredient.FirstOrDefault(m => m.RecipeId == id);
+                _context.Ingredient.Remove(deleteingredient);
+                ingredients--;
+                await _context.SaveChangesAsync();
+            }
+
+            _context.Recipe.Remove(theone);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return Redirect(Request.Headers["Referer"].ToString());
         }
 
         private bool RecipeExists(int id)

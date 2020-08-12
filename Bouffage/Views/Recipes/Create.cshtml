@@ -8,75 +8,94 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="POST">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Recipe.Title" class="control-label"></label>
-                <input asp-for="Recipe.Title" class="form-control" />
-                <span asp-validation-for="Recipe.Title" class="text-danger"></span>
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.CuisineId" class="control-label"></label>
-                <input asp-for="Recipe.CuisineId" class="form-control" />
-                <span asp-validation-for="Recipe.CuisineId" class="text-danger"></span>
+                <label asp-for="CuisineFood" class="control-label"></label>
+                <select asp-for="CuisineFood"
+                        class="form-control"
+                        asp-items="Html.GetEnumSelectList<Recipe.CuisineFood>()">
+                    <option>Select type of cuisine...</option>
+                </select>
+                <span asp-validation-for="CuisineFood" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.Cuisine" class="control-label"></label>
-                <select asp-for="Recipe.Cuisine" class="form-control"></select>
-                <span asp-validation-for="Recipe.Cuisine" class="text-danger"></span>
+                <label asp-for="Complex" class="control-label"></label>
+                <select asp-for="Complex"
+                        class="form-control"
+                        asp-items="Html.GetEnumSelectList<Recipe.Complex>()">
+                    <option>Select complexity ...</option>
+                </select>
+                <span asp-validation-for="Complex" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.Essay" class="control-label"></label>
-                <input asp-for="Recipe.Essay" class="form-control" />
-                <span asp-validation-for="Recipe.Essay" class="text-danger"></span>
+                <label asp-for="Essay" class="control-label"></label>
+                <input asp-for="Essay" class="form-control" />
+                <span asp-validation-for="Essay" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.Preparation" class="control-label"></label>
-                <input asp-for="Recipe.Preparation" class="form-control" />
-                <span asp-validation-for="Recipe.Preparation" class="text-danger"></span>
+                <label asp-for="Preparation" class="control-label"></label>
+                <input asp-for="Preparation" class="form-control" />
+                <span asp-validation-for="Preparation" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.PrepTime" class="control-label"></label>
-                <input asp-for="Recipe.PrepTime" class="form-control" />
-                <span asp-validation-for="Recipe.PrepTime" class="text-danger"></span>
+                <label asp-for="PrepTime" class="control-label"></label>
+                <input asp-for="PrepTime" class="form-control" />
+                <span asp-validation-for="PrepTime" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.CookTime" class="control-label"></label>
-                <input asp-for="Recipe.CookTime" class="form-control" />
-                <span asp-validation-for="Recipe.CookTime" class="text-danger"></span>
+                <label asp-for="CookTime" class="control-label"></label>
+                <input asp-for="CookTime" class="form-control" />
+                <span asp-validation-for="CookTime" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.Servings" class="control-label"></label>
-                <input asp-for="Recipe.Servings" class="form-control" />
-                <span asp-validation-for="Recipe.Servings" class="text-danger"></span>
+                <label asp-for="Servings" class="control-label"></label>
+                <input asp-for="Servings" class="form-control" />
+                <span asp-validation-for="Servings" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Recipe.ComplexityId" class="control-label"></label>
-                <input asp-for="Recipe.ComplexityId" class="form-control" />
-                <span asp-validation-for="Recipe.ComplexityId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Recipe.Complexity" class="control-label"></label>
-                <select asp-for="Recipe.Complexity" class="form-control"></select>
-                <span asp-validation-for="Recipe.Complexity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Recipe.SpecialEquipment" class="control-label"></label>
-                <input asp-for="Recipe.SpecialEquipment" class="form-control" />
-                <span asp-validation-for="Recipe.SpecialEquipment" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Recipe.UserPostedRecipeId" class="control-label"></label>
-                <input asp-for="Recipe.UserPostedRecipeId" class="form-control" />
-                <span asp-validation-for="Recipe.UserPostedRecipeId" class="text-danger"></span>
+                <label asp-for="SpecialEquipment" class="control-label"></label>
+                <input asp-for="SpecialEquipment" class="form-control" />
+                <span asp-validation-for="SpecialEquipment" class="text-danger"></span>
             </div>
 
-            <button onclick="AddIngredient()">Нова Состојка</button>
+            <hr />
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label asp-for="SelectedCategories" class="control-label">Categories which apply to this recipe:</label>
+                        <select asp-for="SelectedCategories" class="form-control js-example-basic-multiple" asp-items="Model.Categories">
+                            <option value="">/</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="ingredients">
+                <div class="form-group">
+                    Quantity and ingredient used:
+                    <input type="text" name="ingredient[]" class="control-label" />
+                </div>
+            </div>
+
+            <button type="button" onclick="AddIngredient()">Нова Состојка</button>
 
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
+        <script>
+            function AddIngredient() {
+                var add = `<div class="form-group">
+                    <input type="text" name="ingredient[]" class="control-label" />
+                </div>`;
+                document.getElementById("ingredients").innerHTML += add;
+            }
+        </script>
     </div>
 </div>
 
