@@ -144,8 +144,13 @@
                         </ul>
                     }
 
+                    <form asp-action="Search" asp-controller="Recipes" class="searchform" method="POST">
+                        <input type="text" class="search" name="searchtext" placeholder="Search..." required>
+                        <!-- <input class="submit" type="submit" value=""> -->
+                    </form>
+
                 }
-                </div>
+            </div>
         </nav>
     </header>
     <div style="margin-left: 2%; margin-right: 2%; padding: unset; border: none; margin-top: 6%">

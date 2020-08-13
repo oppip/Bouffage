@@ -38,6 +38,9 @@ namespace Bouffage.Controllers
             IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
             recipes = recipes.Include(m => m.User).Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(s => s.User);
             recipes = recipes.Include(m => m.CommentsOnThisRecipe).ThenInclude(m => m.Replies);
+
+
+
             var recipesandcomments = new RecipeAndCommentsViewModel
             {
                 Recipes = await recipes.ToListAsync(),
@@ -134,7 +137,7 @@ namespace Bouffage.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                foreach(var ingre in ingredient)
+                foreach (var ingre in ingredient)
                 {
                     Ingredient n = new Ingredient
                     {
@@ -232,10 +235,10 @@ namespace Bouffage.Controllers
             com = com.Where(m => m.CommentOnRecipeId == id);
             int rep = com.Count() - theone.CommentsOnThisRecipe.Count();
             int comments = theone.CommentsOnThisRecipe.Count();
-            int replies= rep;
+            int replies = rep;
             int ingredients = theone.Ingredients.Count();
-            
-            while(replies>0)
+
+            while (replies > 0)
             {
                 var deletereply = _context.Comment.FirstOrDefault(m => m.CommentOnRecipeId == id);
                 _context.Comment.Remove(deletereply);
@@ -278,6 +281,8 @@ namespace Bouffage.Controllers
             var recipe = await _context.Recipe.FirstOrDefaultAsync(m => m.RecipeId == id);
             IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
             recipes = recipes.Where(m => m.RecipeId == id).Include(m => m.User).Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(s => s.User);
+            recipes = recipes.Include(m => m.CommentsOnThisRecipe).ThenInclude(m => m.Replies).ThenInclude(m => m.User);
+
             if (recipe == null)
             {
                 return NotFound();
@@ -306,6 +311,29 @@ namespace Bouffage.Controllers
                 }
             }
             return uniqueFileName;
+        }
+
+        public async Task<IActionResult> Search([FromForm] string searchtext)
+        {
+            IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
+            IQueryable<User> users = _context.User.AsQueryable();
+
+            recipes = recipes.Include(m => m.User).Include(m => m.Ingredients).Include(m => m.CommentsOnThisRecipe).ThenInclude(s => s.User);
+            recipes = recipes.Include(m => m.CommentsOnThisRecipe).ThenInclude(m => m.Replies).ThenInclude(m => m.User);
+            recipes = recipes.Where(m => m.Essay.Contains(searchtext) || m.Title.Contains(searchtext) || m.User.Username.Contains(searchtext));
+            recipes.Distinct();
+            if (recipes == null)
+            {
+                return NotFound();
+            }
+
+            var recipesandcomments = new RecipeAndCommentsViewModel
+            {
+                Recipes = await recipes.ToListAsync(),
+                Users = await users.ToListAsync()
+            };
+
+            return View(recipesandcomments);
         }
 
     }

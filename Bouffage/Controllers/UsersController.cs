@@ -169,9 +169,13 @@ namespace Bouffage.Controllers
             IQueryable<Recipe> recipes = _context.Recipe.AsQueryable();
             IQueryable<Comment> comments = _context.Comment.AsQueryable();
 
+            if (user == null)
+            {
+                return NotFound();
+            }
+
             recipes = recipes.Where(p => p.UserPostedRecipeId == user.UserId);
             comments = comments.Where(p => p.UserCommentedId == user.UserId).Include(p => p.Recipe);
-
             var cookie = Request.Cookies["MyCookie"];
             string[] list = { "", "", "" };
             if (cookie != null)
@@ -200,12 +204,6 @@ namespace Bouffage.Controllers
                 Ingredients = await ingredients.ToListAsync(),
                 User = user
             };
-
-
-            if (user == null)
-            {
-                return NotFound();
-            }
             return View(userRecipesVM);
         }
 

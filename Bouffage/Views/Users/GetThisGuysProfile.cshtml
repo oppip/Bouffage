@@ -6,7 +6,7 @@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 <div class="card bg-warning" style="width: 100%; margin-left: 7px;">
     <div class="card-body">
-        <div class="inline">
+        <div class="inline" style="width: 18%">
             <img src="@Model.User.Picture" alt="Profile picture" class="profilepic" />
         </div>
         <div class="inline">
@@ -160,7 +160,7 @@
                     }
                 </div>
 
-                <img style="width: 100%; height: auto; display: block;" src="~/Recipe Images/Sampinjoni.jpg" alt="Card image">
+                <img style="width: 100%; height: auto; display: block;" src="@item.Picture" alt="Card image">
 
                 <div class="card-body">
                     <p class="card-text">@Html.DisplayFor(modelItem => item.Essay)</p>

@@ -149,18 +149,20 @@ namespace Bouffage.Controllers
             IQueryable<Comment> commentt = _context.Comment.AsQueryable();
             commentt = commentt.Where(m => m.CommentId == id).Include(m => m.Replies);
             var comment = commentt.FirstOrDefault(m => m.CommentId == id);
-            if (comment.Replies == null)
+            int recipe = (int)comment.CommentOnRecipeId;
+            string url = Request.Headers["Referer"].ToString() + "#" + recipe.ToString();
+            if (!comment.Replies.Any())
             {
                 _context.Comment.Remove(comment);
                 await _context.SaveChangesAsync();
-                return Redirect(Request.Headers["Referer"].ToString());
+                return Redirect(url);
             }
             else
             {
                 comment.UserCommentedId = null;
                 _context.Comment.Update(comment);
                 await _context.SaveChangesAsync();
-                return Redirect(Request.Headers["Referer"].ToString());
+                return Redirect(url);
             }
             
         }
